@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from mediascan.album_yaml_file_loader import load_album_yaml_file
+from mediascan.types.album.album_yaml_file_loader import load_album_yaml_file
 
 
 def test_load_album_yaml_file(tmp_path: Path) -> None:

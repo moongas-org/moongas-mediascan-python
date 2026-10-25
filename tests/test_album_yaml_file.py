@@ -1,4 +1,4 @@
-from mediascan.album_yaml_file import AlbumYamlFile
+from mediascan.types.album.album_yaml_file import AlbumYamlFile
 
 
 def test_album_yaml_file_from_yaml() -> None:

@@ -4,8 +4,8 @@ from typing import Optional
 from dataclass_wizard.v0 import YAMLWizard
 from dataclass_wizard.v0.enums import LetterCase
 
-from mediascan.track_data import TrackData
-from mediascan.track_id_data import TrackIdData
+from .track_data import TrackData
+from .track_id_data import TrackIdData
 
 
 @dataclass

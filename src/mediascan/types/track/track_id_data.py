@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
+from .track_fpcalc_data import TrackFpCalcData
 
 from dataclass_wizard.v0 import YAMLWizard
 from dataclass_wizard.v0.enums import LetterCase
@@ -10,6 +11,9 @@ class TrackIdData(YAMLWizard, key_transform=LetterCase.CAMEL):
     """
     TrackIdData contains identifiers and URLs for a track across various streaming services.
     """
+
+    # Fpcalc data (audio fingerprinting)
+    fpcalc_data: Optional[TrackFpCalcData] = None
 
     # Industry standard key for cross-platform matching
     isrc: Optional[str] = None

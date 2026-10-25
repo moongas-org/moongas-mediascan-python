@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from mediascan.artist_yaml_file_validator import (
+from mediascan.types.artist.artist_yaml_file_validator import (
     validate_artist_yaml_content,
     validate_artist_yaml_file,
 )

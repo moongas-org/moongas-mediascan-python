@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclass_wizard.v0 import YAMLWizard
 
-from .media_file_data import MediaFileData
+from ..media_file.media_file_data import MediaFileData
 
 
 @dataclass

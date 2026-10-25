@@ -3,7 +3,7 @@ from typing import cast
 
 import yaml
 
-from mediascan.album_yaml_file_loader import load_album_yaml_file
+from .album_yaml_file_loader import load_album_yaml_file
 
 
 def validate_album_yaml_content(content: str) -> None:

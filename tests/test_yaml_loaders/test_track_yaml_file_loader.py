@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from mediascan.track_yaml_file_loader import load_track_yaml_file
+from mediascan.types.track.track_yaml_file_loader import load_track_yaml_file
 
 VALID_TRACK_YAML = """
 trackData:

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclass_wizard.v0 import YAMLWizard
 
-from .artist_data import ArtistData
+from ..artist.artist_data import ArtistData
 
 
 @dataclass

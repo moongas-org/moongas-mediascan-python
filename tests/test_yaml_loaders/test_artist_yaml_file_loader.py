@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from mediascan.artist_yaml_file_loader import load_artist_yaml_file
+from mediascan.types.artist.artist_yaml_file_loader import load_artist_yaml_file
 
 
 def test_load_artist_yaml_file(tmp_path: Path) -> None:

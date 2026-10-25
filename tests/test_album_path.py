@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 from typing import Generator
 
-from mediascan.utils.path.album_path import AlbumPathBuilder
+from mediascan.types.album.album_path import AlbumPathBuilder
 
 
 @pytest.fixture(scope="function")

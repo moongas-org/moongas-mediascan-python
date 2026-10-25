@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from mediascan.media_files_yaml_file_loader import load_media_files_yaml_file
+from mediascan.types.media_files.media_files_yaml_file_loader import load_media_files_yaml_file
 
 VALID_MEDIA_FILES_YAML = """
 files:
