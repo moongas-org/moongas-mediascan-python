@@ -21,6 +21,9 @@ trackIdData:
         - id: 2344a322-fa91-46a1-b70d-e9c8539de5f9
           recordings:
             - id: 0c652621-96d6-46bb-a886-b277b87bafd4
+              isrcs:
+                - USSM18500120
+                - GBARL8500001
           score: 0.98905593
       status: ok
 """
@@ -45,6 +48,10 @@ def test_load_track_yaml_file(tmp_path: Path) -> None:
         loaded.track_id_data[0].acoustid_data.results[0].recordings[0].id
         == "0c652621-96d6-46bb-a886-b277b87bafd4"
     )
+    assert loaded.track_id_data[0].acoustid_data.results[0].recordings[0].isrcs == [
+        "USSM18500120",
+        "GBARL8500001",
+    ]
     assert loaded.track_id_data[0].acoustid_data.results[0].score == 0.98905593
 
 

@@ -7,6 +7,7 @@ from dataclass_wizard.v0.enums import LetterCase
 @dataclass
 class TrackAcoustIDRecording(YAMLWizard, key_transform=LetterCase.CAMEL):
     id: str
+    isrcs: list[str]
 
 
 @dataclass
