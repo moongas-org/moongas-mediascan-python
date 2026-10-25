@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
+
+from .track_acoustid_data import TrackAcoustIDData
 from .track_fpcalc_data import TrackFpCalcData
 
 from dataclass_wizard.v0 import YAMLWizard
@@ -14,6 +16,9 @@ class TrackIdData(YAMLWizard, key_transform=LetterCase.CAMEL):
 
     # Fpcalc data (audio fingerprinting)
     fpcalc_data: Optional[TrackFpCalcData] = None
+
+    # AcoustID data (as returned by api.acoustid.org)
+    acoustid_data: Optional[TrackAcoustIDData] = None
 
     # Industry standard key for cross-platform matching
     isrc: Optional[str] = None
