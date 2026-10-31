@@ -9,7 +9,6 @@ from dataclass_wizard.v0 import asdict, fromdict
 from mediascan.types.track.streaming.streaming_data import StreamingData
 from mediascan.types.track.streaming.streaming_spotify_data import (
     SpotifyAPIData,
-    SpotifyTrack,
     StreamingSpotifyData,
 )
 from mediascan.types.track.track_id_data import TrackIdData
@@ -89,6 +88,8 @@ def spotify_response() -> dict[str, Any]:
 
 @pytest.mark.parametrize("format", ["json", "yaml"])
 def test_spotify_response_round_trip(spotify_response: dict[str, Any], format: str) -> None:
+    spotify_response["futureResponseField"] = {"preserved": True}
+    spotify_response["tracks"]["items"][0]["futureTrackField"] = {"preserved": True}
     payload = {
         "streamingService": "spotify",
         "trackUrl": "https://open.spotify.com/track/0ZYf6N5eBeXStMri0mf3DZ",
@@ -100,28 +101,27 @@ def test_spotify_response_round_trip(spotify_response: dict[str, Any], format: s
     data = StreamingSpotifyData.from_yaml(text)
 
     assert isinstance(data, StreamingData)
-    assert isinstance(data.api_data, SpotifyAPIData)
+    assert data.api_data == spotify_response
     assert data.track_id == payload["trackId"]
     assert data.track_url == payload["trackUrl"]
     assert data.isrc == "USSM10027739"
-    page = data.api_data.tracks
-    assert page.limit == 5
-    assert page.total == 0
-    assert page.next is None
-    assert page.previous is None
-    assert len(page.items) == 2
-    first, second = page.items
-    assert isinstance(first, SpotifyTrack)
-    assert first.duration_ms == 263573
-    assert first.external_ids.isrc == "USSM10027739"
-    assert first.explicit is False
-    assert first.is_playable is True
-    assert first.artists[0].name == "'Til Tuesday"
-    assert first.album.release_date == "1985-06-01"
-    assert [image.height for image in first.album.images] == [640, 300, 64]
-    assert second.id == "23zAhaNLZGR0YnMhOs1Aax"
-    assert second.album.album_type == "compilation"
-    assert second.duration_ms == 261800
+    page = data.api_data["tracks"]
+    assert page["limit"] == 5
+    assert page["total"] == 0
+    assert page["next"] is None
+    assert page["previous"] is None
+    assert len(page["items"]) == 2
+    first, second = page["items"]
+    assert first["duration_ms"] == 263573
+    assert first["external_ids"]["isrc"] == "USSM10027739"
+    assert first["explicit"] is False
+    assert first["is_playable"] is True
+    assert first["artists"][0]["name"] == "'Til Tuesday"
+    assert first["album"]["release_date"] == "1985-06-01"
+    assert [image["height"] for image in first["album"]["images"]] == [640, 300, 64]
+    assert second["id"] == "23zAhaNLZGR0YnMhOs1Aax"
+    assert second["album"]["album_type"] == "compilation"
+    assert second["duration_ms"] == 261800
     assert yaml.safe_load(data.to_yaml()) == payload
     assert json.loads(json.dumps(asdict(data))) == payload
 
@@ -202,12 +202,12 @@ def test_track_id_data_generic_services(spotify_response: dict[str, Any]) -> Non
     assert TrackIdData.from_yaml("streamingData: []").streaming_data == []
 
 
-def test_typed_spotify_serialization_in_track_file(spotify_response: dict[str, Any]) -> None:
+def test_raw_spotify_api_data_serialization_in_track_file(spotify_response: dict[str, Any]) -> None:
     spotify = StreamingSpotifyData(
         streaming_service="spotify",
         track_url="https://open.spotify.com/track/example",
         track_id="example",
-        api_data=fromdict(SpotifyAPIData, spotify_response),
+        api_data=deepcopy(spotify_response),
     )
     data = TrackYamlFile.from_yaml(
         "trackData: {title: Example, artist: Artist, albumartist: Artist, album: Album, genre: Rock, year: 2026}"

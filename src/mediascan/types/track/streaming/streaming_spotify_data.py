@@ -90,6 +90,4 @@ class SpotifyAPIData(YAMLWizard, key_transform=LetterCase.NONE):
 
 @dataclass
 class StreamingSpotifyData(StreamingData, key_transform=LetterCase.CAMEL):
-    """Spotify track identifiers and its typed search response."""
-
-    api_data: SpotifyAPIData
+    """Spotify track identifiers and its unmodified search response."""

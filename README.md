@@ -93,6 +93,10 @@ mediaFileData:
 as a `trackIdData` mapping rather than a list. Its `streamingData` field remains
 a list so one track can have multiple streaming identifiers. Track files without
 identifiers may omit `trackIdData`.
+For Spotify entries, `apiData` retains the complete search response as a nested
+mapping, including paging metadata and all returned tracks. The Spotify-specific
+streaming model keeps this subtree unmodified, including fields unknown to the
+current mediascan model.
 
 `TrackYamlFile.media_file_data` is an optional list of `MediaFileData` entries.
 `fpcalc_data` and `acoustid_data` belong to each media-file entry, not to
