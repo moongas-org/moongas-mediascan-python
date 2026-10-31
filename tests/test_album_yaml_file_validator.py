@@ -46,6 +46,33 @@ def test_validate_album_yaml_content_accepts_valid_yaml() -> None:
     validate_album_yaml_content(album_yaml())
 
 
+@pytest.mark.parametrize("genres", [[], ["Rock", "Alternative"]])
+def test_validate_album_yaml_content_accepts_genres(genres: list[str]) -> None:
+    content = yaml.safe_dump({
+        "albumData": {
+            "name": "Example Album",
+            "dateReleased": {"y": 1993},
+            "explicitCover": True,
+            "genres": genres,
+        }
+    })
+    validate_album_yaml_content(content)
+
+
+@pytest.mark.parametrize("genres", [None, "Rock", 1, {}, ["Rock", 1], [True]])
+def test_validate_album_yaml_content_rejects_invalid_genres(genres: object) -> None:
+    content = yaml.safe_dump({
+        "albumData": {
+            "name": "Example Album",
+            "dateReleased": {"y": 1993},
+            "explicitCover": True,
+            "genres": genres,
+        }
+    })
+    with pytest.raises(ValueError, match="albumData.genres must be a list of strings"):
+        validate_album_yaml_content(content)
+
+
 def test_validate_album_yaml_content_rejects_invalid_yaml() -> None:
     with pytest.raises(yaml.YAMLError):
         validate_album_yaml_content("albumData: [unterminated\n")

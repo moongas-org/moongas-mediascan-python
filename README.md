@@ -147,6 +147,11 @@ payloads remain unrestricted.
 
 ### Go schema alignment
 
+`AlbumData.genres` is a list of strings, serialized as `albumData.genres` in
+album YAML files (for example, `genres: [Rock, Alternative]`). It defaults to an
+empty list when omitted; album validation rejects non-list values and non-string
+entries.
+
 The Python models mirror the current `moongas-mediascan-go` working-tree types:
 
 - `Date` now lives in `mediascan.types.date.date`, shared by artist and album data.

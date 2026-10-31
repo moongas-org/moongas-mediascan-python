@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from dataclass_wizard.v0 import YAMLWizard
 from dataclass_wizard.v0.enums import LetterCase
@@ -13,3 +13,4 @@ class AlbumData(YAMLWizard, key_transform=LetterCase.CAMEL):
     name: str
     date_released: Date
     explicit_cover: bool
+    genres: list[str] = field(default_factory=list[str])

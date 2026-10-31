@@ -27,6 +27,13 @@ def validate_album_yaml_content(content: str) -> None:
     if not isinstance(album_data["explicitCover"], bool):
         raise ValueError("albumData.explicitCover must be a boolean")
 
+    if "genres" in album_data:
+        genres = album_data["genres"]
+        if not isinstance(genres, list):
+            raise ValueError("albumData.genres must be a list of strings")
+        if not all(isinstance(genre, str) for genre in cast(list[object], genres)):
+            raise ValueError("albumData.genres must be a list of strings")
+
     date_released_value = album_data["dateReleased"]
     if not isinstance(date_released_value, dict):
         raise ValueError("albumData.dateReleased must be a mapping")
