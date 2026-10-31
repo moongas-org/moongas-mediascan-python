@@ -131,6 +131,18 @@ external IDs, preserving Spotify's snake_case API keys during serialization.
 Loading a track file keeps `api_data` as raw data, matching Go's generic streaming
 entries; loading `StreamingSpotifyData` directly produces typed nested objects.
 
+### Track YAML validation
+
+`validate_track_yaml_content` in
+`mediascan.types.track.track_yaml_file_validator` returns the parsed mapping on
+success and raises `ValueError` for invalid schema or field types. YAML syntax
+errors propagate as `yaml.YAMLError`. It rejects duplicate and unsupported fields,
+requires the six core metadata fields with non-empty strings and an integer year,
+and validates streaming identifiers, fingerprints, and nested AcoustID results.
+Optional media-file fields may be omitted or null, and fractional durations and
+quoted or YAML-native modification timestamps are supported. Raw `apiData`
+payloads remain unrestricted.
+
 ### Go schema alignment
 
 The Python models mirror the current `moongas-mediascan-go` working-tree types:
