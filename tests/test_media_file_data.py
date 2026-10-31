@@ -3,7 +3,7 @@ from dataclasses import fields
 import pytest
 import yaml
 
-from mediascan.types.media_file.media_file_data import MediaFileData, MediaFileWithArtistData
+from mediascan.types.media_file.media_file_data import MediaFileData
 from mediascan.types.track.track_id_data import TrackIdData
 from mediascan.types.track.track_yaml_file import TrackYamlFile
 
@@ -75,19 +75,3 @@ def test_partial_and_complete_media_files_round_trip() -> None:
 
 def test_track_id_data_only_contains_streaming_fields() -> None:
     assert [field.name for field in fields(TrackIdData)] == ["streaming_data"]
-
-
-def test_joined_media_file_artist_fields_remain_required() -> None:
-    media_file = MediaFileWithArtistData(
-        path="/music/example.flac",
-        artist_name="Artist",
-        city="City",
-        country_code="US",
-        region_code="CA",
-        language_code="en",
-    )
-    assert media_file.path == "/music/example.flac"
-    assert media_file.artist_name == "Artist"
-    assert media_file.fpcalc_data is None
-    with pytest.raises(TypeError):
-        MediaFileWithArtistData()

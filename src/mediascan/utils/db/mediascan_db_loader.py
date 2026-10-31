@@ -36,6 +36,21 @@ def get_df_artists(engine: sqlalchemy.Engine):
         return artists
 
 
+def get_df_albums(engine: sqlalchemy.Engine) -> pd.DataFrame:
+    with engine.connect() as conn:
+        return pd.read_sql_query("SELECT * FROM album", conn)
+
+
+def get_df_tracks(engine: sqlalchemy.Engine) -> pd.DataFrame:
+    with engine.connect() as conn:
+        return pd.read_sql_query("SELECT * FROM track", conn)
+
+
+def get_df_track_streaming(engine: sqlalchemy.Engine) -> pd.DataFrame:
+    with engine.connect() as conn:
+        return pd.read_sql_query("SELECT * FROM trackstreaming", conn)
+
+
 def get_df_files_artistdata_joined(engine: sqlalchemy.Engine):
     with engine.connect() as conn:
         files = pd.read_sql_query(

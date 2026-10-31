@@ -1,0 +1,13 @@
+from dataclasses import dataclass
+
+from dataclass_wizard.v0 import YAMLWizard
+from dataclass_wizard.v0.enums import LetterCase
+
+
+@dataclass
+class Date(YAMLWizard, key_transform=LetterCase.CAMEL):
+    """Calendar date with a required year and optional month and day."""
+
+    y: int
+    m: int | None = None
+    d: int | None = None

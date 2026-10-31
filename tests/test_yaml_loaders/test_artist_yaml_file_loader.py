@@ -16,7 +16,6 @@ artistData:
   regionCode: US-CA
   languageCodes:
     - en
-  members: []
 """)
 
     loaded = load_artist_yaml_file(artist_yaml_path)

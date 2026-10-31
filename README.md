@@ -102,8 +102,8 @@ current mediascan model.
 `fpcalc_data` and `acoustid_data` belong to each media-file entry, not to
 `TrackIdData`. All media-file fields are optional, so fingerprint-only entries
 are supported without inventing file paths or tag values. Existing complete
-media-file entries remain supported. The joined artist fields of
-`MediaFileWithArtistData` remain required and are keyword-only.
+media-file entries remain supported. Media-file entries also support `albumPath`,
+`artistPath`, fractional `duration` values, and RFC 3339 `modTime` timestamps.
 
 `mediascan.types.track.streaming.streaming_data.StreamingData` accepts raw API
 data for any service (including `None`). For typed Spotify search results, use
@@ -130,3 +130,26 @@ models cover pagination, tracks, albums, artists, artwork, external URLs, and
 external IDs, preserving Spotify's snake_case API keys during serialization.
 Loading a track file keeps `api_data` as raw data, matching Go's generic streaming
 entries; loading `StreamingSpotifyData` directly produces typed nested objects.
+
+### Go schema alignment
+
+The Python models mirror the current `moongas-mediascan-go` working-tree types:
+
+- `Date` now lives in `mediascan.types.date.date`, shared by artist and album data.
+- `Artist`, `Album`, and `Track` in their respective type packages wrap YAML
+  metadata with a `path`. Artist and album paths refer to their directories;
+  track paths refer to their YAML files.
+- Fingerprint and AcoustID types now live under `mediascan.types.media_file`:
+  `MediaFileFpCalcData`, `MediaFileAcoustIDData`, `MediaFileAcoustIDResult`,
+  and `MediaFileAcoustIDRecording`. The old track-prefixed modules were removed.
+- Artist metadata no longer includes `members`. `ArtistMember`,
+  `ArtistDataOldFmt`, `ArtistYamlFileOldFmt`, and the old-format loader were removed.
+- The aggregate `types.artists` and `types.media_files` YAML formats and their
+  loaders were removed along with Go's corresponding output commands.
+- `MediaFileWithArtistData` was removed; joined database results remain available
+  as DataFrames via `get_df_files_artistdata_joined`.
+
+Database helpers in `mediascan.utils.db.mediascan_db_loader` now include
+`get_df_albums`, `get_df_tracks`, and `get_df_track_streaming` for Go's `album`,
+`track`, and `trackstreaming` tables. Existing artist and media-file/artist join
+helpers remain available.

@@ -1,0 +1,14 @@
+from dataclasses import dataclass
+
+from dataclass_wizard.v0 import YAMLWizard
+from dataclass_wizard.v0.enums import LetterCase
+
+from .album_yaml_file import AlbumYamlFile
+
+
+@dataclass
+class Album(YAMLWizard, key_transform=LetterCase.CAMEL):
+    """Album YAML metadata and the directory containing the file."""
+
+    album_yaml_file: AlbumYamlFile
+    path: str

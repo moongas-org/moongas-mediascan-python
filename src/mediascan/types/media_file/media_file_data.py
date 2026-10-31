@@ -1,11 +1,12 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
 from dataclass_wizard.v0 import YAMLWizard
 from dataclass_wizard.v0.enums import LetterCase
 
-from ..track.track_acoustid_data import TrackAcoustIDData
-from ..track.track_fpcalc_data import TrackFpCalcData
+from .media_file_acoustid_data import MediaFileAcoustIDData
+from .media_file_fpcalc_data import MediaFileFpCalcData
 
 
 @dataclass
@@ -22,6 +23,8 @@ class MediaFileData(YAMLWizard, key_transform=LetterCase.CAMEL):
     """
 
     path: Optional[str] = None
+    album_path: str = ""
+    artist_path: str = ""
     size: Optional[int] = None
     format: Optional[str] = None
     title: Optional[str] = None
@@ -30,23 +33,8 @@ class MediaFileData(YAMLWizard, key_transform=LetterCase.CAMEL):
     album: Optional[str] = None
     genre: Optional[str] = None
     year: Optional[int] = None
-    duration: Optional[int] = None
+    duration: Optional[float] = None
+    mod_time: Optional[datetime] = None
 
-    fpcalc_data: Optional[TrackFpCalcData] = None
-    acoustid_data: Optional[TrackAcoustIDData] = None
-
-
-@dataclass(kw_only=True)
-class MediaFileWithArtistData(MediaFileData):
-    """
-    Represents a mediafile with (scalar) artist data.
-    This data is formed by joining the mediascan db
-    mediafiles table with the artists data table.
-    Joined artist fields are required keyword-only arguments.
-    """
-
-    artist_name: str
-    city: str
-    country_code: str
-    region_code: str
-    language_code: str
+    fpcalc_data: Optional[MediaFileFpCalcData] = None
+    acoustid_data: Optional[MediaFileAcoustIDData] = None

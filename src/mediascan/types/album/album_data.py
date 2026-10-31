@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from dataclass_wizard.v0 import YAMLWizard
 from dataclass_wizard.v0.enums import LetterCase
 
-from ..artist.artist_data import Date
+from ..date.date import Date
 
 
 @dataclass

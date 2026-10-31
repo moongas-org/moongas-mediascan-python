@@ -24,25 +24,10 @@ def validate_artist_yaml_content(content: str) -> None:
         "countryCode",
         "regionCode",
         "languageCodes",
-        "members",
     )
     for required_field in REQUIRED_FIELDS:
         if required_field not in artist_data:
             raise ValueError(f"artistData is missing required tag '{required_field}'")
-
-    if not isinstance(artist_data["members"], list):
-        raise ValueError("artistData.members must be a list")
-
-    members = cast(list[object], artist_data["members"])
-    for index, member in enumerate(members):
-        if not isinstance(member, dict):
-            raise ValueError(f"member {index} must be a mapping")
-        member = cast(dict[str, object], member)
-        # REQUIRED_MEMBER_FIELDS = ("artistNames", "dob", "artistBands", "artistRoles") 
-        REQUIRED_MEMBER_FIELDS = ("artistNames",) 
-        for required_field in REQUIRED_MEMBER_FIELDS:
-            if required_field not in member:
-                raise ValueError(f"member {index} is missing required tag '{required_field}'")
 
 
 def validate_artist_yaml_file(

@@ -6,7 +6,7 @@ from dataclass_wizard.v0.enums import LetterCase
 
 
 @dataclass
-class TrackAcoustIDRecording(YAMLWizard, key_transform=LetterCase.CAMEL):
+class MediaFileAcoustIDRecording(YAMLWizard, key_transform=LetterCase.CAMEL):
     id: str  # MusicBrainz recording ID
     title: Optional[str] = None  # Title of the recording
     length: Optional[int] = None  # Length of the recording in milliseconds
@@ -17,15 +17,15 @@ class TrackAcoustIDRecording(YAMLWizard, key_transform=LetterCase.CAMEL):
 
 
 @dataclass
-class TrackAcoustIDResult(YAMLWizard, key_transform=LetterCase.CAMEL):
+class MediaFileAcoustIDResult(YAMLWizard, key_transform=LetterCase.CAMEL):
     id: str  # AcoustID result ID
-    recordings: list[TrackAcoustIDRecording]
+    recordings: list[MediaFileAcoustIDRecording]
     score: float
 
 
 @dataclass
-class TrackAcoustIDData(YAMLWizard, key_transform=LetterCase.CAMEL):
-    """TrackAcoustIDData represents a response from the AcoustID API."""
+class MediaFileAcoustIDData(YAMLWizard, key_transform=LetterCase.CAMEL):
+    """MediaFileAcoustIDData represents a response from the AcoustID API."""
 
-    results: list[TrackAcoustIDResult]
+    results: list[MediaFileAcoustIDResult]
     status: str
