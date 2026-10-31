@@ -59,3 +59,70 @@ python -m pip install -e ".[dev]"
 ### Optional dependency groups
 
 - `[dev]` - development dependencies (includes `pytest` and `ruff`)
+
+### Track streaming data
+
+`StreamingService` in `mediascan.types.track.streaming.streaming_service` is a
+string enum of streaming service names, for example `StreamingService.Spotify`
+(`"spotify"`) and `StreamingService.AppleMusic` (`"apple-music"`).
+
+In `TrackIdData`, `streaming_data` replaces
+the old top-level `isrc` and service-specific fields such as `spotify_id`.
+Move those identifiers into entries shaped like this:
+
+```yaml
+trackIdData:
+  streamingData:
+    - streamingService: spotify
+      isrc: USSM10027739
+      trackUrl: https://open.spotify.com/track/0ZYf6N5eBeXStMri0mf3DZ
+      trackId: 0ZYf6N5eBeXStMri0mf3DZ
+      apiData:
+        tracks:
+          items: []
+mediaFileData:
+  - fpcalcData:
+      duration: 263.62
+      fingerprint: example-fingerprint
+    acoustidData:
+      status: ok
+      results: []
+```
+
+`TrackYamlFile.track_id_data` is a single optional `TrackIdData` object, serialized
+as a `trackIdData` mapping rather than a list. Its `streamingData` field remains
+a list so one track can have multiple streaming identifiers. Track files without
+identifiers may omit `trackIdData`.
+
+`TrackYamlFile.media_file_data` is an optional list of `MediaFileData` entries.
+`fpcalc_data` and `acoustid_data` belong to each media-file entry, not to
+`TrackIdData`. All media-file fields are optional, so fingerprint-only entries
+are supported without inventing file paths or tag values. Existing complete
+media-file entries remain supported. The joined artist fields of
+`MediaFileWithArtistData` remain required and are keyword-only.
+
+`mediascan.types.track.streaming.streaming_data.StreamingData` accepts raw API
+data for any service (including `None`). For typed Spotify search results, use
+`StreamingSpotifyData` and `SpotifyAPIData` from
+`mediascan.types.track.streaming.streaming_spotify_data`:
+
+```python
+from mediascan.types.track.streaming.streaming_spotify_data import (
+    SpotifyAPIData,
+    StreamingSpotifyData,
+)
+
+spotify = StreamingSpotifyData(
+    streaming_service="spotify",
+    track_url="https://open.spotify.com/track/0ZYf6N5eBeXStMri0mf3DZ",
+    track_id="0ZYf6N5eBeXStMri0mf3DZ",
+    isrc="USSM10027739",
+    api_data=SpotifyAPIData.from_yaml(raw_spotify_response),
+)
+```
+
+Here `raw_spotify_response` is the raw JSON or YAML response text. The Spotify
+models cover pagination, tracks, albums, artists, artwork, external URLs, and
+external IDs, preserving Spotify's snake_case API keys during serialization.
+Loading a track file keeps `api_data` as raw data, matching Go's generic streaming
+entries; loading `StreamingSpotifyData` directly produces typed nested objects.

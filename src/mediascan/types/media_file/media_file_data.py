@@ -1,7 +1,11 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from dataclass_wizard.v0 import YAMLWizard
 from dataclass_wizard.v0.enums import LetterCase
+
+from ..track.track_acoustid_data import TrackAcoustIDData
+from ..track.track_fpcalc_data import TrackFpCalcData
 
 
 @dataclass
@@ -13,28 +17,32 @@ class MediaFileData(YAMLWizard, key_transform=LetterCase.CAMEL):
     fields specific to the media file itself e.g. 'format' whereas
     TrackData focuses on an abstract representation of track metadata that may or
     may not have an associated local media file.
-    TrackData contains info such as spotify_id, title, artist, album, etc.
-
+    Fields may be absent in partial track YAML entries containing only
+    fingerprints and AcoustID results.
     """
 
-    path: str
-    size: int
-    format: str
-    title: str
-    artist: str
-    albumartist: str
-    album: str
-    genre: str
-    year: int
-    duration: int
+    path: Optional[str] = None
+    size: Optional[int] = None
+    format: Optional[str] = None
+    title: Optional[str] = None
+    artist: Optional[str] = None
+    albumartist: Optional[str] = None
+    album: Optional[str] = None
+    genre: Optional[str] = None
+    year: Optional[int] = None
+    duration: Optional[int] = None
+
+    fpcalc_data: Optional[TrackFpCalcData] = None
+    acoustid_data: Optional[TrackAcoustIDData] = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class MediaFileWithArtistData(MediaFileData):
     """
     Represents a mediafile with (scalar) artist data.
     This data is formed by joining the mediascan db
     mediafiles table with the artists data table.
+    Joined artist fields are required keyword-only arguments.
     """
 
     artist_name: str

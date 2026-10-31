@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from dataclass_wizard.v0 import YAMLWizard
 from dataclass_wizard.v0.enums import LetterCase
@@ -6,13 +7,18 @@ from dataclass_wizard.v0.enums import LetterCase
 
 @dataclass
 class TrackAcoustIDRecording(YAMLWizard, key_transform=LetterCase.CAMEL):
-    id: str
-    isrcs: list[str]
+    id: str  # MusicBrainz recording ID
+    title: Optional[str] = None  # Title of the recording
+    length: Optional[int] = None  # Length of the recording in milliseconds
+    video: Optional[bool] = None
+    disambiguation: Optional[str] = None
+    first_release_date: Optional[str] = None
+    isrcs: Optional[list[str]] = None
 
 
 @dataclass
 class TrackAcoustIDResult(YAMLWizard, key_transform=LetterCase.CAMEL):
-    id: str
+    id: str  # AcoustID result ID
     recordings: list[TrackAcoustIDRecording]
     score: float
 
