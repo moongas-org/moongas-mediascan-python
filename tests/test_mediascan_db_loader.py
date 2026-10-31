@@ -10,6 +10,7 @@ from mediascan.utils.db.mediascan_db_loader import (
     get_df_track,
     get_df_track_album_artist_joined,
     get_df_trackstreaming,
+    get_df_trackstreaming_track_album_artist_joined,
 )
 
 
@@ -38,12 +39,18 @@ def test_go_database_tables_and_existing_join() -> None:
             {"trackid": 4, "streamingservice": "spotify", "streamingtrackid": "spotify-id"}
         ]
         joined = get_df_track_album_artist_joined(engine)
-        assert joined.loc[:, "name"].iloc[0].tolist() == ["Artist", "Album"]
+        assert joined.loc[0, "artist_name"] == "Artist"
+        assert joined.loc[0, "album_name"] == "Album"
+        assert joined.columns.is_unique
         assert get_df_mediafile(engine)["id"].tolist() == [3]
-        assert (
-            get_df_mediafile_track_album_artist_joined(engine)["trackid"].tolist()
-            == [4]
-        )
+        mediafile_joined = get_df_mediafile_track_album_artist_joined(engine)
+        assert mediafile_joined["trackid"].tolist() == [4]
+        assert mediafile_joined["track_id"].tolist() == [4]
+        assert mediafile_joined.columns.is_unique
+        streaming_joined = get_df_trackstreaming_track_album_artist_joined(engine)
+        assert streaming_joined["artist_name"].tolist() == ["Artist"]
+        assert streaming_joined["album_name"].tolist() == ["Album"]
+        assert streaming_joined.columns.is_unique
     finally:
         engine.dispose()
 
@@ -78,13 +85,17 @@ def test_track_join_uses_ids_and_preserves_missing_relations() -> None:
         assert len(joined) == 5
         assert joined.loc["Both", "city"] == "City"
         assert joined.loc["Both", "explicitcover"] == 1
-        assert joined.loc["Both", "name"].tolist() == ["Artist", "Album"]
+        assert joined.loc["Both", "artist_name"] == "Artist"
+        assert joined.loc["Both", "album_name"] == "Album"
+        assert joined.columns.is_unique
         assert joined.loc["Artist only", "city"] == "City"
         assert pd.isna(joined.loc["Artist only", "explicitcover"])
         assert pd.isna(joined.loc["Album only", "city"])
         assert joined.loc["Album only", "explicitcover"] == 1
-        assert joined.loc["Neither", "name"].isna().all()
-        assert joined.loc["Unmatched", "name"].isna().all()
+        assert pd.isna(joined.loc["Neither", "artist_name"])
+        assert pd.isna(joined.loc["Neither", "album_name"])
+        assert pd.isna(joined.loc["Unmatched", "artist_name"])
+        assert pd.isna(joined.loc["Unmatched", "album_name"])
         with engine.begin() as conn:
             conn.exec_driver_sql("DELETE FROM track")
         empty = get_df_track_album_artist_joined(engine)

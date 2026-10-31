@@ -56,16 +56,54 @@ def get_df_trackstreaming(engine: sqlalchemy.Engine) -> pd.DataFrame:
         return pd.read_sql_query("SELECT * FROM trackstreaming", conn)
 
 
+def _read_joined_tables(
+    conn: sqlalchemy.Connection,
+    tables: tuple[str, ...],
+    from_clause: str,
+) -> pd.DataFrame:
+    columns_by_table = {
+        table: [column["name"] for column in sqlalchemy.inspect(conn).get_columns(table)]
+        for table in tables
+    }
+    column_counts: dict[str, int] = {}
+    for columns in columns_by_table.values():
+        for column in columns:
+            column_counts[column] = column_counts.get(column, 0) + 1
+
+    reserved_names = {
+        column for column, count in column_counts.items() if count == 1
+    }
+    used_names: set[str] = set()
+    quote = conn.dialect.identifier_preparer.quote
+    selections: list[str] = []
+    for table, columns in columns_by_table.items():
+        for column in columns:
+            name = column
+            if column_counts[column] > 1:
+                name = f"{table}_{column}"
+                suffix = 2
+                while name in reserved_names or name in used_names:
+                    name = f"{table}_{column}_{suffix}"
+                    suffix += 1
+            used_names.add(name)
+            selection = f"{quote(table)}.{quote(column)}"
+            if name != column:
+                selection += f" AS {quote(name)}"
+            selections.append(selection)
+
+    query = f"SELECT {', '.join(selections)} FROM {from_clause}"
+    return pd.read_sql_query(query, conn)
+
+
 def get_df_track_album_artist_joined(engine: sqlalchemy.Engine) -> pd.DataFrame:
     """Return track, artist, and album columns, retaining tracks without related rows."""
     with engine.connect() as conn:
-        files = pd.read_sql_query(
-            "SELECT track.*, artist.*, album.* FROM track "
-            "LEFT JOIN artist ON track.artistid = artist.id "
-            "LEFT JOIN album ON track.albumid = album.id",
+        return _read_joined_tables(
             conn,
+            ("track", "artist", "album"),
+            '"track" LEFT JOIN "artist" ON "track"."artistid" = "artist"."id" '
+            'LEFT JOIN "album" ON "track"."albumid" = "album"."id"',
         )
-        return files
 
 
 def get_df_mediafile(engine: sqlalchemy.Engine) -> pd.DataFrame:
@@ -78,12 +116,12 @@ def get_df_mediafile_track_album_artist_joined(
 ) -> pd.DataFrame:
     """Return mediafile, track, album, and artist columns, retaining mediafiles without related rows."""
     with engine.connect() as conn:
-        return pd.read_sql_query(
-            "SELECT mediafile.*, track.*, album.*, artist.* FROM mediafile "
-            "LEFT JOIN track ON mediafile.trackid = track.id "
-            "LEFT JOIN album ON track.albumid = album.id "
-            "LEFT JOIN artist ON track.artistid = artist.id",
+        return _read_joined_tables(
             conn,
+            ("mediafile", "track", "album", "artist"),
+            '"mediafile" LEFT JOIN "track" ON "mediafile"."trackid" = "track"."id" '
+            'LEFT JOIN "album" ON "track"."albumid" = "album"."id" '
+            'LEFT JOIN "artist" ON "track"."artistid" = "artist"."id"',
         )
 
 
@@ -92,10 +130,10 @@ def get_df_trackstreaming_track_album_artist_joined(
 ) -> pd.DataFrame:
     """Return trackstreaming, track, album, and artist columns, retaining trackstreaming without related rows."""
     with engine.connect() as conn:
-        return pd.read_sql_query(
-            "SELECT trackstreaming.*, track.*, album.*, artist.* FROM trackstreaming "
-            "LEFT JOIN track ON trackstreaming.trackid = track.id "
-            "LEFT JOIN album ON track.albumid = album.id "
-            "LEFT JOIN artist ON track.artistid = artist.id",
+        return _read_joined_tables(
             conn,
+            ("trackstreaming", "track", "album", "artist"),
+            '"trackstreaming" LEFT JOIN "track" ON "trackstreaming"."trackid" = "track"."id" '
+            'LEFT JOIN "album" ON "track"."albumid" = "album"."id" '
+            'LEFT JOIN "artist" ON "track"."artistid" = "artist"."id"',
         )
