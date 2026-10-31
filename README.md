@@ -102,8 +102,10 @@ current mediascan model.
 `fpcalc_data` and `acoustid_data` belong to each media-file entry, not to
 `TrackIdData`. All media-file fields are optional, so fingerprint-only entries
 are supported without inventing file paths or tag values. Existing complete
-media-file entries remain supported. Media-file entries also support `albumPath`,
-`artistPath`, fractional `duration` values, and RFC 3339 `modTime` timestamps.
+media-file entries remain supported. Media-file entries also support fractional
+`duration` values and RFC 3339 `modTime` timestamps. Unlike the Go model, this
+package omits `albumPath` and `artistPath` from media-file metadata; database
+columns and joins are unchanged.
 
 `mediascan.types.track.streaming.streaming_data.StreamingData` accepts raw API
 data for any service (including `None`). For typed Spotify search results, use
@@ -159,9 +161,13 @@ The Python models mirror the current `moongas-mediascan-go` working-tree types:
 - The aggregate `types.artists` and `types.media_files` YAML formats and their
   loaders were removed along with Go's corresponding output commands.
 - `MediaFileWithArtistData` was removed; joined database results remain available
-  as DataFrames via `get_df_files_artistdata_joined`.
+  as DataFrames via `get_df_track_artist_joined` and `get_df_mediafile_track_joined`.
 
 Database helpers in `mediascan.utils.db.mediascan_db_loader` now include
-`get_df_albums`, `get_df_tracks`, and `get_df_track_streaming` for Go's `album`,
-`track`, and `trackstreaming` tables. Existing artist and media-file/artist join
-helpers remain available.
+`get_df_albums`, `get_df_tracks`, and `get_df_trackstreaming` for Go's `album`,
+`track`, and `trackstreaming` tables. `get_df_track_artist_joined` left-joins
+tracks to artists via `track.artistid` and albums via `track.albumid`, retaining
+tracks even when related rows are missing. It returns all columns in track,
+artist, album order; shared column names such as `id`, `path`, and `name` are
+duplicated. `get_df_mediafile` and `get_df_mediafile_track_joined` provide
+media-file data and its track join.

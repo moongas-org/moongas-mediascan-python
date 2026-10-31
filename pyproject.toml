@@ -70,6 +70,7 @@ include = ["mediascan*"]
 
 [tool.pytest.ini_options]
 pythonpath = [
+  "src",
   "."
 ]
 testpaths = [

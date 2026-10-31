@@ -50,8 +50,6 @@ def test_accepts_complete_track_and_preserves_raw_api_data() -> None:
     document["mediaFileData"] = [
         {
             "path": "song.flac",
-            "albumPath": "Album",
-            "artistPath": "Artist",
             "size": 100,
             "format": "FLAC",
             "title": "Song",
@@ -137,6 +135,8 @@ def test_rejects_invalid_acoustid_data(acoustid: object) -> None:
         {"fpcalcData": {"unknown": "field"}},
         {"acoustidData": []},
         {"path": 123},
+        {"albumPath": "Album"},
+        {"artistPath": "Artist"},
         {"unexpected": "field"},
     ],
 )

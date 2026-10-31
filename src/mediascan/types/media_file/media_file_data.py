@@ -22,9 +22,10 @@ class MediaFileData(YAMLWizard, key_transform=LetterCase.CAMEL):
     fingerprints and AcoustID results.
     """
 
+    # path to media file (relative to collection root)
     path: Optional[str] = None
-    album_path: str = ""
-    artist_path: str = ""
+
+    # fields scanned from ID3 tags
     size: Optional[int] = None
     format: Optional[str] = None
     title: Optional[str] = None
@@ -33,8 +34,11 @@ class MediaFileData(YAMLWizard, key_transform=LetterCase.CAMEL):
     album: Optional[str] = None
     genre: Optional[str] = None
     year: Optional[int] = None
+
+    # other file properties
     duration: Optional[float] = None
     mod_time: Optional[datetime] = None
 
+    # fingerprint and AcoustID results
     fpcalc_data: Optional[MediaFileFpCalcData] = None
     acoustid_data: Optional[MediaFileAcoustIDData] = None

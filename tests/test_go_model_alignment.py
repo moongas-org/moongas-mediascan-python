@@ -72,13 +72,11 @@ def test_path_wrappers_round_trip() -> None:
         assert type(wrapper).from_yaml(wrapper.to_yaml()) == wrapper
 
 
-def test_media_file_paths_fractional_duration_and_timestamp() -> None:
+def test_media_file_fractional_duration_and_timestamp() -> None:
     data = fromdict(
         MediaFileData,
         {
             "path": "/music/Artist/Album/Song.flac",
-            "albumPath": "/music/Artist/Album",
-            "artistPath": "/music/Artist",
             "size": 123456789,
             "format": "FLAC",
             "duration": 263.573,
@@ -90,8 +88,6 @@ def test_media_file_paths_fractional_duration_and_timestamp() -> None:
             },
         },
     )
-    assert data.album_path == "/music/Artist/Album"
-    assert data.artist_path == "/music/Artist"
     assert data.duration == 263.573
     assert data.mod_time == datetime(2026, 10, 31, 12, 55, 20, tzinfo=timezone.utc)
     assert isinstance(data.fpcalc_data, MediaFileFpCalcData)
@@ -100,8 +96,9 @@ def test_media_file_paths_fractional_duration_and_timestamp() -> None:
     assert isinstance(data.acoustid_data.results[0].recordings[0], MediaFileAcoustIDRecording)
     serialized = yaml.safe_load(data.to_yaml())
     assert serialized["duration"] == 263.573
-    assert serialized["albumPath"] == data.album_path
-    assert serialized["artistPath"] == data.artist_path
+    assert "albumPath" not in serialized
+    assert "artistPath" not in serialized
+    assert {"album_path", "artist_path"}.isdisjoint(field.name for field in fields(MediaFileData))
     assert "modTime" in serialized
     assert MediaFileData.from_yaml(data.to_yaml()) == data
 
