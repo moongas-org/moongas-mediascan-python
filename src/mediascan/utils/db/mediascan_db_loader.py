@@ -95,6 +95,16 @@ def _read_joined_tables(
     return pd.read_sql_query(query, conn)
 
 
+def get_df_album_artist_joined(engine: sqlalchemy.Engine) -> pd.DataFrame:
+    """Return album and artist columns, retaining albums without artists and aliasing shared names."""
+    with engine.connect() as conn:
+        return _read_joined_tables(
+            conn,
+            ("album", "artist"),
+            '"album" LEFT JOIN "artist" ON "album"."artistid" = "artist"."id"',
+        )
+
+
 def get_df_track_album_artist_joined(engine: sqlalchemy.Engine) -> pd.DataFrame:
     """Return track, artist, and album columns, retaining tracks without related rows."""
     with engine.connect() as conn:

@@ -171,3 +171,10 @@ tracks even when related rows are missing. It returns all columns in track,
 artist, album order; shared column names such as `id`, `path`, and `name` are
 duplicated. `get_df_mediafile` and `get_df_mediafile_track_joined` provide
 media-file data and its track join.
+
+`get_df_album_artist_joined(engine)` returns all album and artist columns in
+album, artist order, left-joining `album.artistid` to `artist.id`. Albums with
+missing or unmatched artists remain in the result. Conflicting column names
+receive table prefixes, for example `album_id`, `artist_id`, `album_name`, and
+`artist_name`; unique names remain unchanged. Numeric suffixes resolve any
+further alias collisions, keeping DataFrame column names unique.

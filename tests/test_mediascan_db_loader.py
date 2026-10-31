@@ -4,6 +4,7 @@ import sqlalchemy
 
 from mediascan.utils.db.mediascan_db_loader import (
     get_df_album,
+    get_df_album_artist_joined,
     get_df_artist,
     get_df_mediafile,
     get_df_mediafile_track_album_artist_joined,
@@ -60,6 +61,67 @@ def test_missing_database_table_raises() -> None:
     try:
         with pytest.raises(pd.errors.DatabaseError, match="no such table: track"):
             get_df_track(engine)
+    finally:
+        engine.dispose()
+
+
+def test_album_join_uses_ids_and_preserves_missing_relations() -> None:
+    engine = sqlalchemy.create_engine("sqlite://")
+    try:
+        with engine.begin() as conn:
+            for statement in (
+                "CREATE TABLE artist (id INTEGER PRIMARY KEY, path TEXT, name TEXT, city TEXT)",
+                "CREATE TABLE album (id INTEGER PRIMARY KEY, path TEXT, name TEXT, year INTEGER, artistid INTEGER)",
+                "INSERT INTO artist VALUES (10, '/music/Artist', 'Artist', 'City')",
+                "INSERT INTO album VALUES (1, '/music/Artist/Album', 'Matched', 2026, 10)",
+                "INSERT INTO album VALUES (2, '/music/Other/Album', 'Missing', 2025, NULL)",
+                "INSERT INTO album VALUES (3, '/music/Artist/Other', 'Unmatched', 2024, 99)",
+            ):
+                conn.exec_driver_sql(statement)
+        joined = get_df_album_artist_joined(engine)
+        expected_columns = [
+            "album_id", "album_path", "album_name", "year", "artistid",
+            "artist_id", "artist_path", "artist_name", "city",
+        ]
+        assert joined.columns.tolist() == expected_columns
+        assert joined.columns.is_unique
+        assert len(joined) == 3
+        albums = joined.set_index("album_name")
+        assert albums.loc["Matched", "album_id"] == 1
+        assert albums.loc["Matched", "artist_id"] == 10
+        assert albums.loc["Matched", "artist_name"] == "Artist"
+        assert albums.loc["Matched", "city"] == "City"
+        assert albums.loc["Matched", "album_path"] == "/music/Artist/Album"
+        assert albums.loc["Matched", "artist_path"] == "/music/Artist"
+        assert albums.loc["Matched", "year"] == 2026
+        for name in ("Missing", "Unmatched"):
+            assert pd.isna(albums.loc[name, "artist_id"])
+            assert pd.isna(albums.loc[name, "artist_name"])
+        with engine.begin() as conn:
+            conn.exec_driver_sql("DELETE FROM album")
+        empty = get_df_album_artist_joined(engine)
+        assert empty.empty
+        assert empty.columns.tolist() == expected_columns
+    finally:
+        engine.dispose()
+
+
+def test_album_join_aliases_do_not_collide_with_existing_columns() -> None:
+    engine = sqlalchemy.create_engine("sqlite://")
+    try:
+        with engine.begin() as conn:
+            conn.exec_driver_sql("CREATE TABLE artist (id INTEGER PRIMARY KEY, name TEXT)")
+            conn.exec_driver_sql(
+                "CREATE TABLE album (id INTEGER PRIMARY KEY, name TEXT, artistid INTEGER, album_name TEXT, album_name_2 TEXT)"
+            )
+            conn.exec_driver_sql("INSERT INTO artist VALUES (10, 'Artist')")
+            conn.exec_driver_sql("INSERT INTO album VALUES (1, 'Album', 10, 'Existing', 'Also existing')")
+        joined = get_df_album_artist_joined(engine)
+        assert joined.columns.is_unique
+        assert joined.loc[0, "album_name"] == "Existing"
+        assert joined.loc[0, "album_name_2"] == "Also existing"
+        assert joined.loc[0, "album_name_3"] == "Album"
+        assert joined.loc[0, "artist_name"] == "Artist"
     finally:
         engine.dispose()
 
