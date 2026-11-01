@@ -196,3 +196,27 @@ missing or unmatched artists remain in the result. Conflicting column names
 receive table prefixes, for example `album_id`, `artist_id`, `album_name`, and
 `artist_name`; unique names remain unchanged. Numeric suffixes resolve any
 further alias collisions, keeping DataFrame column names unique.
+
+`MediaFileDataWithAlbumAndArtistData` and
+`row_to_media_file_data_with_album_and_artist_data` in
+`mediascan.types.media_file.media_file_data_with_album_and_artist_data` provide
+typed media-file records for `get_df_mediafile_track_album_artist_joined`.
+The converter accepts a pandas row from `iterrows()` or a record mapping,
+reads media-file metadata from the `mediafile_*` aliases, and includes joined
+album/artist paths and artist location fields. Missing related data becomes
+`None`. Size, format, and duration are also `None`, since the current database
+table does not store these properties.
+
+```python
+from mediascan.types.media_file.media_file_data_with_album_and_artist_data import (
+    row_to_media_file_data_with_album_and_artist_data,
+)
+from mediascan.utils.db.mediascan_db_loader import (
+    get_df_mediafile_track_album_artist_joined,
+)
+
+mediafiles = [
+    row_to_media_file_data_with_album_and_artist_data(row)
+    for _, row in get_df_mediafile_track_album_artist_joined(engine).iterrows()
+]
+```
