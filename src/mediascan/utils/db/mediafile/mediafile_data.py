@@ -4,6 +4,7 @@ from typing import Protocol
 from mediascan.utils.db._dataframe_row import (
     optional_integer as _optional_integer,
     optional_text as _optional_text,
+    optional_float as _optional_float,
 )
 
 
@@ -25,6 +26,9 @@ class MediaFileData:
     album: str | None
     genre: str | None
     year: int | None
+    artistid: int | None
+    albumid: int | None
+    trackid: int | None
     size: int | None = None
     format: str | None = None
     duration: float | None = None
@@ -49,4 +53,10 @@ def row_to_mediafile_data(row: _MediaFileRow) -> MediaFileData:
         album=_optional_text(row["album"]),
         genre=_optional_text(row["genre"]),
         year=_optional_integer(row["year"]),
+        artistid=_optional_integer(row["artistid"]),
+        albumid=_optional_integer(row["albumid"]),
+        trackid=_optional_integer(row["trackid"]),
+        size=_optional_integer(row["size"]),
+        format=_optional_text(row["format"]),
+        duration=_optional_float(row["duration"]),
     )

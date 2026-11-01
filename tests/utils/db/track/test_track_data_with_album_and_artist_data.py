@@ -24,6 +24,8 @@ def test_row_to_track_data_with_album_and_artist_data():
             album="Album",
             genre="Rock",
             track_year=2001,
+            track_artistid=10,
+            albumid=20,
             countrycode="US",
             regioncode="CA",
             city="Los Angeles",
@@ -37,6 +39,8 @@ def test_row_to_track_data_with_album_and_artist_data():
     assert track.format == "mp3"
     assert track.album_path == "/music/Artist/Album"
     assert track.artist_path == "/music/Artist"
+    assert track.artistid == 10
+    assert track.albumid == 20
     assert track.countryCode == "US"
     assert track.regionCode == "CA"
     assert track.languageCode == "en"
@@ -76,6 +80,8 @@ def test_convert_actual_joined_track_dataframe(album_has_genre: bool) -> None:
             genre="Rock",
             year=2001,
             duration=0,
+            artistid=10,
+            albumid=20,
             countryCode="US",
             regionCode="CA",
             city="Los Angeles",
@@ -115,6 +121,8 @@ def test_convert_nullable_track_from_loader(
         assert track.id == 1
         assert track.path == "/music/track.yml"
         assert track.year == year
+        assert track.artistid == artist_id
+        assert track.albumid == album_id
         assert track.title is None
         assert track.artist is None
         assert track.albumartist is None
@@ -143,6 +151,8 @@ def nullable_track_row() -> SimpleNamespace:
         album=None,
         track_genre=None,
         track_year=None,
+        track_artistid=None,
+        albumid=None,
         countrycode=None,
         regioncode=None,
         city=None,
@@ -171,6 +181,8 @@ def test_convert_track_missing_values(
         "album",
         "genre",
         "year",
+        "artistid",
+        "albumid",
         "countryCode",
         "regionCode",
         "city",

@@ -46,6 +46,8 @@ def test_convert_track_row(tracks: pd.DataFrame) -> None:
         "album": "Album",
         "genre": "Genre",
         "year": 2002,
+        "artistid": 10,
+        "albumid": 20,
     }
     assert row_to_track_data(row.to_dict()) == track
 

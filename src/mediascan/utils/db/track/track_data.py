@@ -25,6 +25,8 @@ class TrackData:
     album: str | None
     genre: str | None
     year: int | None
+    artistid: int | None
+    albumid: int | None
 
 
 def row_to_track_data(row: _TrackRow) -> TrackData:
@@ -46,4 +48,6 @@ def row_to_track_data(row: _TrackRow) -> TrackData:
         album=_optional_text(row["album"]),
         genre=_optional_text(row["genre"]),
         year=_optional_integer(row["year"]),
+        artistid=_optional_integer(row["artistid"]),
+        albumid=_optional_integer(row["albumid"]),
     )

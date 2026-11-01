@@ -55,6 +55,8 @@ def test_convert_joined_trackstreaming_row(
         "album": "Album",
         "genre": "Track genre",
         "year": 2001,
+        "artistid": 10,
+        "albumid": 20,
         "countryCode": "US",
         "regionCode": "CA",
         "city": "City",

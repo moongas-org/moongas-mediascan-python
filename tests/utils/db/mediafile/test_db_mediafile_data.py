@@ -20,13 +20,14 @@ def mediafiles() -> pd.DataFrame:
                 "CREATE TABLE mediafile (id INTEGER PRIMARY KEY, path TEXT, "
                 "albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, "
                 "albumartist TEXT, album TEXT, genre TEXT, year INTEGER, "
+                "size INTEGER, format TEXT, duration REAL, "
                 "artistid INTEGER, albumid INTEGER, trackid INTEGER)"
             )
             conn.exec_driver_sql(
                 "INSERT INTO mediafile VALUES "
                 "(1, '/music/Artist/Album/song.flac', '/music/Artist/Album', "
                 "'/music/Artist', 'Title', 'Artist', 'Album artist', 'Album', "
-                "'Genre', 2002, 10, 20, 30)"
+                "'Genre', 2002, 12345, 'flac', 201.5, 10, 20, 30)"
             )
         return get_df_mediafile(engine)
     finally:
@@ -49,9 +50,12 @@ def test_convert_mediafile_row(mediafiles: pd.DataFrame) -> None:
         "album": "Album",
         "genre": "Genre",
         "year": 2002,
-        "size": None,
-        "format": None,
-        "duration": None,
+        "artistid": 10,
+        "albumid": 20,
+        "trackid": 30,
+        "size": 12345,
+        "format": "flac",
+        "duration": 201.5,
     }
     assert row_to_mediafile_data(row.to_dict()) == mediafile
 

@@ -21,6 +21,8 @@ class TrackDataWithAlbumAndArtistData:
     genre: str | None
     year: int | None
     duration: int
+    artistid: int | None = None
+    albumid: int | None = None
     countryCode: str | None = None
     regionCode: str | None = None
     city: str | None = None
@@ -51,6 +53,10 @@ def row_to_track_data_with_album_and_artist_data(
         genre=optional_text(row.track_genre if hasattr(row, "track_genre") else row.genre),
         year=optional_integer(row.track_year),
         duration=0,
+        artistid=optional_integer(
+            row.track_artistid if hasattr(row, "track_artistid") else row.artistid
+        ),
+        albumid=optional_integer(row.albumid),
         countryCode=optional_text(row.countrycode),
         regionCode=optional_text(row.regioncode),
         city=optional_text(row.city),

@@ -28,6 +28,8 @@ class TrackStreamingDataWithTrackAlbumAndArtistData:
     album: str | None
     genre: str | None
     year: int | None
+    artistid: int | None
+    albumid: int | None
     countryCode: str | None
     regionCode: str | None
     city: str | None
@@ -64,6 +66,10 @@ def row_to_trackstreaming_data_with_track_album_and_artist_data(
         year=_optional_integer(
             row["track_year"] if "track_year" in row else row["year"]
         ),
+        artistid=_optional_integer(
+            row["track_artistid"] if "track_artistid" in row else row["artistid"]
+        ),
+        albumid=_optional_integer(row["albumid"]),
         countryCode=_optional_text(row["countrycode"]),
         regionCode=_optional_text(row["regioncode"]),
         city=_optional_text(row["city"]),

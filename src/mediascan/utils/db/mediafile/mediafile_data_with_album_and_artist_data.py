@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from mediascan.utils.db._dataframe_row import (
+    optional_float as _optional_float,
     optional_integer as _optional_integer,
     optional_text as _optional_text,
 )
@@ -25,6 +26,9 @@ class MediaFileDataWithAlbumAndArtistData:
     album: str | None
     genre: str | None
     year: int | None
+    artistid: int | None = None
+    albumid: int | None = None
+    trackid: int | None = None
     size: int | None = None
     format: str | None = None
     duration: float | None = None
@@ -37,10 +41,7 @@ class MediaFileDataWithAlbumAndArtistData:
 def row_to_mediafile_data_with_album_and_artist_data(
     row: _JoinedRow,
 ) -> MediaFileDataWithAlbumAndArtistData:
-    """Convert an iterrows() row or record mapping using the joined dataframe aliases.
-
-    Size, format, and duration are not stored in the current mediafile table.
-    """
+    """Convert an iterrows() row or record mapping using the joined dataframe aliases."""
     path = _optional_text(row["mediafile_path"])
     if path is None:
         raise ValueError("mediafile_path must not be missing")
@@ -58,6 +59,12 @@ def row_to_mediafile_data_with_album_and_artist_data(
         album=_optional_text(row["mediafile_album"]),
         genre=_optional_text(row["mediafile_genre"]),
         year=_optional_integer(row["mediafile_year"]),
+        artistid=_optional_integer(row["mediafile_artistid"]),
+        albumid=_optional_integer(row["mediafile_albumid"]),
+        trackid=_optional_integer(row["trackid"]),
+        size=_optional_integer(row["size"]),
+        format=_optional_text(row["format"]),
+        duration=_optional_float(row["duration"]),
         countryCode=_optional_text(row["countrycode"]),
         regionCode=_optional_text(row["regioncode"]),
         city=_optional_text(row["city"]),
