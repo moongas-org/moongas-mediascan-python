@@ -12,15 +12,12 @@ class TrackDataWithAlbumAndArtistData:
     path: str
     album_path: str | None
     artist_path: str | None
-    size: int
-    format: str
     title: str | None
     artist: str | None
     albumartist: str | None
     album: str | None
     genre: str | None
     year: int | None
-    duration: int
     artistid: int | None = None
     albumid: int | None = None
     countryCode: str | None = None
@@ -44,15 +41,12 @@ def row_to_track_data_with_album_and_artist_data(
         path=path,
         album_path=optional_text(row.album_path),
         artist_path=optional_text(row.artist_path),
-        size=0,
-        format="mp3",
         title=optional_text(row.title),
         artist=optional_text(row.artist),
         albumartist=optional_text(row.albumartist),
         album=optional_text(row.album),
         genre=optional_text(row.track_genre if hasattr(row, "track_genre") else row.genre),
         year=optional_integer(row.track_year),
-        duration=0,
         artistid=optional_integer(
             row.track_artistid if hasattr(row, "track_artistid") else row.artistid
         ),

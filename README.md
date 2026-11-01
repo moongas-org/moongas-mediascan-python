@@ -208,7 +208,7 @@ receive table prefixes, for example `album_id`, `artist_id`, `album_name`, and
 further alias collisions, keeping DataFrame column names unique.
 
 `row_to_track_data_with_album_and_artist_data` in
-`mediascan.types.track.track_data_with_album_and_artist_data` converts rows from
+`mediascan.utils.db.track.track_data_with_album_and_artist_data` converts rows from
 `get_df_track_album_artist_joined`. It reads `track_id`, `track_path`, and
 `track_year` into the output fields `id`, `path`, and `year`, and reads
 `track_genre` when the album table also has a `genre` column (otherwise `genre`).
@@ -216,8 +216,9 @@ Nullable metadata, including the year and joined album/artist fields, becomes
 `None` instead of strings such as `"None"` or `"nan"`. Empty strings and zero
 years are preserved. Track IDs and paths remain required; missing values raise
 `ValueError`. Non-string text and non-numeric or fractional integer values
-raise errors rather than being silently coerced. Existing placeholder values
-for size (`0`), format (`"mp3"`), and duration (`0`) remain unchanged.
+raise errors rather than being silently coerced. Size, format, and duration are
+not included because the track table does not store them; use the media-file
+types for those properties.
 
 `MediaFileDataWithAlbumAndArtistData` and
 `row_to_mediafile_data_with_album_and_artist_data` in
@@ -226,8 +227,7 @@ typed media-file records for `get_df_mediafile_track_album_artist_joined`.
 The converter accepts a pandas row from `iterrows()` or a record mapping,
 reads media-file metadata from the `mediafile_*` aliases, and includes joined
 album/artist paths and artist location fields. Missing related data becomes
-`None`. Size, format, and duration are also `None`, since the current database
-table does not store these properties.
+`None`. Size, format, and duration are read from the mediafile table.
 
 ```python
 from mediascan.utils.db.mediafile.mediafile_data_with_album_and_artist_data import (
