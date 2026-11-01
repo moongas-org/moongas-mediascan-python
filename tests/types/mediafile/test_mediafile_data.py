@@ -3,22 +3,22 @@ from dataclasses import fields
 import pytest
 import yaml
 
-from mediascan.types.media_file.media_file_data import MediaFileData
+from mediascan.types.mediafile.mediafile_data import MediaFileData
 from mediascan.types.track.track_id_data import TrackIdData
 from mediascan.types.track.track_yaml_file import TrackYamlFile
 
 
 @pytest.mark.parametrize("media_entries", [None, []])
-def test_track_optional_media_files(media_entries: list[MediaFileData] | None) -> None:
+def test_track_optional_mediafiles(media_entries: list[MediaFileData] | None) -> None:
     track = TrackYamlFile.from_yaml(
         "trackData: {title: Example, artist: Artist, albumartist: Artist, album: Album, genre: Rock, year: 2026}"
     )
-    assert track.media_file_data is None
-    track.media_file_data = media_entries
-    assert TrackYamlFile.from_yaml(track.to_yaml()).media_file_data == media_entries
+    assert track.mediafile_data is None
+    track.mediafile_data = media_entries
+    assert TrackYamlFile.from_yaml(track.to_yaml()).mediafile_data == media_entries
 
 
-def test_partial_and_complete_media_files_round_trip() -> None:
+def test_partial_and_complete_mediafiles_round_trip() -> None:
     partial = {
         "fpcalcData": {"duration": 123.5, "fingerprint": "abc123"},
         "acoustidData": {
@@ -53,8 +53,8 @@ def test_partial_and_complete_media_files_round_trip() -> None:
         },
     }
     track = TrackYamlFile.from_yaml(yaml.safe_dump(payload))
-    assert track.media_file_data is not None
-    fingerprinted, tagged = track.media_file_data
+    assert track.mediafile_data is not None
+    fingerprinted, tagged = track.mediafile_data
     assert isinstance(fingerprinted, MediaFileData)
     assert fingerprinted.path is None
     assert fingerprinted.fpcalc_data is not None

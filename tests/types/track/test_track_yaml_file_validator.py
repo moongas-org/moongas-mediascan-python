@@ -20,7 +20,7 @@ def track_document() -> dict[str, object]:
 
 
 @pytest.mark.parametrize("duration", [0, 123, 263.573, None])
-def test_accepts_media_file_duration(duration: int | float | None) -> None:
+def test_accepts_mediafile_duration(duration: int | float | None) -> None:
     document = track_document()
     document["mediaFileData"] = [{"duration": duration}]
     assert validate_track_yaml_content(yaml.safe_dump(document)) == document
@@ -117,7 +117,7 @@ def test_rejects_invalid_acoustid_data(acoustid: object) -> None:
 
 
 @pytest.mark.parametrize(
-    "media_file",
+    "mediafile",
     [
         {"duration": True},
         {"duration": "123.5"},
@@ -140,9 +140,9 @@ def test_rejects_invalid_acoustid_data(acoustid: object) -> None:
         {"unexpected": "field"},
     ],
 )
-def test_rejects_invalid_media_file_fields(media_file: object) -> None:
+def test_rejects_invalid_mediafile_fields(mediafile: object) -> None:
     document = track_document()
-    document["mediaFileData"] = [media_file]
+    document["mediaFileData"] = [mediafile]
     with pytest.raises(ValueError, match=r"mediaFileData\[0\]"):
         validate_track_yaml_content(yaml.safe_dump(document))
 

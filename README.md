@@ -111,7 +111,7 @@ mapping, including paging metadata and all returned tracks. The Spotify-specific
 streaming model keeps this subtree unmodified, including fields unknown to the
 current mediascan model.
 
-`TrackYamlFile.media_file_data` is an optional list of `MediaFileData` entries.
+`TrackYamlFile.mediafile_data` is an optional list of `MediaFileData` entries.
 `fpcalc_data` and `acoustid_data` belong to each media-file entry, not to
 `TrackIdData`. All media-file fields are optional, so fingerprint-only entries
 are supported without inventing file paths or tag values. Existing complete
@@ -171,12 +171,12 @@ The Python models mirror the current `moongas-mediascan-go` working-tree types:
 - `Artist`, `Album`, and `Track` in their respective type packages wrap YAML
   metadata with a `path`. Artist and album paths refer to their directories;
   track paths refer to their YAML files.
-- Fingerprint and AcoustID types now live under `mediascan.types.media_file`:
+- Fingerprint and AcoustID types now live under `mediascan.types.mediafile`:
   `MediaFileFpCalcData`, `MediaFileAcoustIDData`, `MediaFileAcoustIDResult`,
   and `MediaFileAcoustIDRecording`. The old track-prefixed modules were removed.
 - Artist metadata no longer includes `members`. `ArtistMember`,
   `ArtistDataOldFmt`, `ArtistYamlFileOldFmt`, and the old-format loader were removed.
-- The aggregate `types.artists` and `types.media_files` YAML formats and their
+- The aggregate `types.artists` and `types.mediafiles` YAML formats and their
   loaders were removed along with Go's corresponding output commands.
 - `MediaFileWithArtistData` was removed; joined database results remain available
   as DataFrames via `get_df_track_album_artist_joined` and
@@ -220,8 +220,8 @@ raise errors rather than being silently coerced. Existing placeholder values
 for size (`0`), format (`"mp3"`), and duration (`0`) remain unchanged.
 
 `MediaFileDataWithAlbumAndArtistData` and
-`row_to_media_file_data_with_album_and_artist_data` in
-`mediascan.types.media_file.media_file_data_with_album_and_artist_data` provide
+`row_to_mediafile_data_with_album_and_artist_data` in
+`mediascan.utils.db.mediafile.mediafile_data_with_album_and_artist_data` provide
 typed media-file records for `get_df_mediafile_track_album_artist_joined`.
 The converter accepts a pandas row from `iterrows()` or a record mapping,
 reads media-file metadata from the `mediafile_*` aliases, and includes joined
@@ -230,15 +230,15 @@ album/artist paths and artist location fields. Missing related data becomes
 table does not store these properties.
 
 ```python
-from mediascan.types.media_file.media_file_data_with_album_and_artist_data import (
-    row_to_media_file_data_with_album_and_artist_data,
+from mediascan.utils.db.mediafile.mediafile_data_with_album_and_artist_data import (
+    row_to_mediafile_data_with_album_and_artist_data,
 )
 from mediascan.utils.db.mediascan_db_loader import (
     get_df_mediafile_track_album_artist_joined,
 )
 
 mediafiles = [
-    row_to_media_file_data_with_album_and_artist_data(row)
+    row_to_mediafile_data_with_album_and_artist_data(row)
     for _, row in get_df_mediafile_track_album_artist_joined(engine).iterrows()
 ]
 ```

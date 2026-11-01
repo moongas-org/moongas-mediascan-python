@@ -4,9 +4,9 @@ import pandas as pd
 import pytest
 import sqlalchemy
 
-from mediascan.types.media_file.media_file_data_with_album_and_artist_data import (
+from mediascan.utils.db.mediafile.mediafile_data_with_album_and_artist_data import (
     MediaFileDataWithAlbumAndArtistData,
-    row_to_media_file_data_with_album_and_artist_data,
+    row_to_mediafile_data_with_album_and_artist_data,
 )
 from mediascan.utils.db.mediascan_db_loader import (
     get_df_mediafile_track_album_artist_joined,
@@ -38,7 +38,7 @@ def joined_mediafiles() -> pd.DataFrame:
 
 def test_convert_joined_mediafile_row(joined_mediafiles: pd.DataFrame) -> None:
     row = joined_mediafiles.loc[joined_mediafiles["mediafile_id"] == 1].iloc[0]
-    mediafile = row_to_media_file_data_with_album_and_artist_data(row)
+    mediafile = row_to_mediafile_data_with_album_and_artist_data(row)
 
     assert isinstance(mediafile, MediaFileDataWithAlbumAndArtistData)
     assert asdict(mediafile) == {
@@ -60,15 +60,18 @@ def test_convert_joined_mediafile_row(joined_mediafiles: pd.DataFrame) -> None:
         "city": "Los Angeles",
         "languageCode": "en",
     }
-    assert row_to_media_file_data_with_album_and_artist_data(row.to_dict()) == mediafile
+    assert row_to_mediafile_data_with_album_and_artist_data(row.to_dict()) == mediafile
 
 
 @pytest.mark.parametrize("mediafile_id", [2, 3])
 def test_convert_mediafile_without_track(
-    joined_mediafiles: pd.DataFrame, mediafile_id: int,
+    joined_mediafiles: pd.DataFrame,
+    mediafile_id: int,
 ) -> None:
-    row = joined_mediafiles.loc[joined_mediafiles["mediafile_id"] == mediafile_id].iloc[0]
-    mediafile = row_to_media_file_data_with_album_and_artist_data(row)
+    row = joined_mediafiles.loc[joined_mediafiles["mediafile_id"] == mediafile_id].iloc[
+        0
+    ]
+    mediafile = row_to_mediafile_data_with_album_and_artist_data(row)
 
     assert mediafile.id == mediafile_id
     assert mediafile.album_path is None
@@ -86,11 +89,13 @@ def test_convert_mediafile_without_track(
 
 
 @pytest.mark.parametrize("missing", [None, float("nan"), pd.NA])
-def test_convert_missing_values(joined_mediafiles: pd.DataFrame, missing: object) -> None:
+def test_convert_missing_values(
+    joined_mediafiles: pd.DataFrame, missing: object
+) -> None:
     row = joined_mediafiles.iloc[0].to_dict()
     row["city"] = missing
     row["mediafile_year"] = missing
-    mediafile = row_to_media_file_data_with_album_and_artist_data(row)
+    mediafile = row_to_mediafile_data_with_album_and_artist_data(row)
     assert mediafile.city is None
     assert mediafile.year is None
 
@@ -98,7 +103,7 @@ def test_convert_missing_values(joined_mediafiles: pd.DataFrame, missing: object
 def test_convert_preserves_large_integer_id(joined_mediafiles: pd.DataFrame) -> None:
     row = joined_mediafiles.iloc[0].to_dict()
     row["mediafile_id"] = 2**63 - 1
-    assert row_to_media_file_data_with_album_and_artist_data(row).id == 2**63 - 1
+    assert row_to_mediafile_data_with_album_and_artist_data(row).id == 2**63 - 1
 
 
 @pytest.mark.parametrize(
@@ -112,9 +117,12 @@ def test_convert_preserves_large_integer_id(joined_mediafiles: pd.DataFrame) -> 
     ],
 )
 def test_convert_invalid_values_raises(
-    joined_mediafiles: pd.DataFrame, column: str, value: object, error: type[Exception],
+    joined_mediafiles: pd.DataFrame,
+    column: str,
+    value: object,
+    error: type[Exception],
 ) -> None:
     row = joined_mediafiles.iloc[0].to_dict()
     row[column] = value
     with pytest.raises(error):
-        row_to_media_file_data_with_album_and_artist_data(row)
+        row_to_mediafile_data_with_album_and_artist_data(row)

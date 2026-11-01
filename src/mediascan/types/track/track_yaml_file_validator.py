@@ -7,13 +7,13 @@ from typing import TypeGuard, cast
 
 import yaml
 
-from mediascan.types.media_file.media_file_acoustid_data import (
+from mediascan.types.mediafile.mediafile_acoustid_data import (
     MediaFileAcoustIDData,
     MediaFileAcoustIDRecording,
     MediaFileAcoustIDResult,
 )
-from mediascan.types.media_file.media_file_data import MediaFileData
-from mediascan.types.media_file.media_file_fpcalc_data import MediaFileFpCalcData
+from mediascan.types.mediafile.mediafile_data import MediaFileData
+from mediascan.types.mediafile.mediafile_fpcalc_data import MediaFileFpCalcData
 from mediascan.types.track.streaming.streaming_data import StreamingData
 from mediascan.types.track.track_data import TrackData
 from mediascan.types.track.track_id_data import TrackIdData
@@ -28,7 +28,7 @@ def camel_case(name: str) -> str:
 CORE_FIELDS = {field.name for field in fields(TrackData)}
 ID_FIELDS = {camel_case(field.name) for field in fields(TrackIdData)}
 STREAMING_FIELDS = {camel_case(field.name) for field in fields(StreamingData)}
-MEDIA_FILE_FIELDS = {camel_case(field.name) for field in fields(MediaFileData)}
+MEDIAFILE_FIELDS = {camel_case(field.name) for field in fields(MediaFileData)}
 FPCALC_FIELDS = {camel_case(field.name) for field in fields(MediaFileFpCalcData)}
 ACOUSTID_FIELDS = {camel_case(field.name) for field in fields(MediaFileAcoustIDData)}
 RESULT_FIELDS = {camel_case(field.name) for field in fields(MediaFileAcoustIDResult)}
@@ -142,15 +142,15 @@ def validate_track_yaml_content(content: str) -> dict[str, object]:
                 isrc = streaming.get("isrc")
                 if isrc is not None and not isinstance(isrc, str):
                     raise ValueError(f"{field_path}.isrc must be a string or null")
-    media_files = document.get("mediaFileData")
-    if media_files is not None:
-        if not is_list(media_files):
+    mediafiles = document.get("mediaFileData")
+    if mediafiles is not None:
+        if not is_list(mediafiles):
             raise ValueError("mediaFileData must be a list")
-        for index, media_file in enumerate(media_files):
+        for index, mediafile in enumerate(mediafiles):
             field_path = f"mediaFileData[{index}]"
-            if not is_mapping(media_file) or media_file.keys() - MEDIA_FILE_FIELDS:
+            if not is_mapping(mediafile) or mediafile.keys() - MEDIAFILE_FIELDS:
                 raise ValueError(f"{field_path} must contain only supported media-file fields")
-            for key, value in media_file.items():
+            for key, value in mediafile.items():
                 value_path = f"{field_path}.{key}"
                 if key == "fpcalcData":
                     if value is not None:

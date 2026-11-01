@@ -5,8 +5,8 @@ from typing import Optional
 from dataclass_wizard.v0 import YAMLWizard
 from dataclass_wizard.v0.enums import LetterCase
 
-from .media_file_acoustid_data import MediaFileAcoustIDData
-from .media_file_fpcalc_data import MediaFileFpCalcData
+from .mediafile_acoustid_data import MediaFileAcoustIDData
+from .mediafile_fpcalc_data import MediaFileFpCalcData
 
 
 @dataclass

@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import sqlalchemy
 
-from mediascan.types.track.track_data_with_album_and_artist_data import (
+from mediascan.utils.db.track.track_data_with_album_and_artist_data import (
     TrackDataWithAlbumAndArtistData,
     row_to_track_data_with_album_and_artist_data,
 )
@@ -91,7 +91,9 @@ def test_convert_actual_joined_track_dataframe(album_has_genre: bool) -> None:
 )
 @pytest.mark.parametrize("year", [2001, None])
 def test_convert_nullable_track_from_loader(
-    artist_id: int | None, album_id: int | None, year: int | None,
+    artist_id: int | None,
+    album_id: int | None,
+    year: int | None,
 ) -> None:
     engine = sqlalchemy.create_engine("sqlite://")
     try:
@@ -150,16 +152,29 @@ def nullable_track_row() -> SimpleNamespace:
 
 @pytest.mark.parametrize("missing", [None, float("nan"), pd.NA])
 def test_convert_track_missing_values(
-    nullable_track_row: SimpleNamespace, missing: object,
+    nullable_track_row: SimpleNamespace,
+    missing: object,
 ) -> None:
     values = vars(nullable_track_row).copy()
     for column in values:
         if column not in ("track_id", "track_path"):
             values[column] = missing
-    track = row_to_track_data_with_album_and_artist_data(pd.Series(values, dtype=object))
+    track = row_to_track_data_with_album_and_artist_data(
+        pd.Series(values, dtype=object)
+    )
     for field in (
-        "album_path", "artist_path", "title", "artist", "albumartist", "album",
-        "genre", "year", "countryCode", "regionCode", "city", "languageCode",
+        "album_path",
+        "artist_path",
+        "title",
+        "artist",
+        "albumartist",
+        "album",
+        "genre",
+        "year",
+        "countryCode",
+        "regionCode",
+        "city",
+        "languageCode",
     ):
         assert getattr(track, field) is None
 
@@ -181,7 +196,9 @@ def test_convert_track_preserves_empty_and_zero_values(
 @pytest.mark.parametrize("column", ["track_id", "track_path"])
 @pytest.mark.parametrize("missing", [None, float("nan"), pd.NA])
 def test_convert_track_requires_identity(
-    nullable_track_row: SimpleNamespace, column: str, missing: object,
+    nullable_track_row: SimpleNamespace,
+    column: str,
+    missing: object,
 ) -> None:
     setattr(nullable_track_row, column, missing)
     with pytest.raises(ValueError, match=f"{column} must not be missing"):
@@ -200,7 +217,9 @@ def test_convert_track_requires_identity(
     ],
 )
 def test_convert_track_rejects_invalid_metadata(
-    nullable_track_row: SimpleNamespace, column: str, value: object,
+    nullable_track_row: SimpleNamespace,
+    column: str,
+    value: object,
     error: type[Exception],
 ) -> None:
     setattr(nullable_track_row, column, value)

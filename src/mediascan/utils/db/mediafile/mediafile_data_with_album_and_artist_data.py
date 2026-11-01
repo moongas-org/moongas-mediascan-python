@@ -34,7 +34,7 @@ class MediaFileDataWithAlbumAndArtistData:
     languageCode: str | None = None
 
 
-def row_to_media_file_data_with_album_and_artist_data(
+def row_to_mediafile_data_with_album_and_artist_data(
     row: _JoinedRow,
 ) -> MediaFileDataWithAlbumAndArtistData:
     """Convert an iterrows() row or record mapping using the joined dataframe aliases.

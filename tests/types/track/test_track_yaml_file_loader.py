@@ -62,29 +62,29 @@ def test_load_track_yaml_file(tmp_path: Path) -> None:
     assert streaming.track_id == "example-track-id"
     assert streaming.track_url == "https://open.spotify.com/track/example-track-id"
     assert streaming.api_data == {"tracks": {"items": []}}
-    assert loaded.media_file_data is not None
-    media_file = loaded.media_file_data[0]
-    assert media_file.path is None
-    assert media_file.fpcalc_data is not None
-    assert media_file.fpcalc_data.duration == 263.62
-    assert media_file.fpcalc_data.fingerprint == "example-fingerprint"
-    assert media_file.acoustid_data is not None
-    assert media_file.acoustid_data.status == "ok"
+    assert loaded.mediafile_data is not None
+    mediafile = loaded.mediafile_data[0]
+    assert mediafile.path is None
+    assert mediafile.fpcalc_data is not None
+    assert mediafile.fpcalc_data.duration == 263.62
+    assert mediafile.fpcalc_data.fingerprint == "example-fingerprint"
+    assert mediafile.acoustid_data is not None
+    assert mediafile.acoustid_data.status == "ok"
     assert (
-        media_file.acoustid_data.results[0].recordings[0].id
+        mediafile.acoustid_data.results[0].recordings[0].id
         == "0c652621-96d6-46bb-a886-b277b87bafd4"
     )
-    assert media_file.acoustid_data.results[0].recordings[0].isrcs == [
+    assert mediafile.acoustid_data.results[0].recordings[0].isrcs == [
         "GBBKS0000003",
         "GBBKS0000042",
     ]
-    recording = media_file.acoustid_data.results[0].recordings[0]
+    recording = mediafile.acoustid_data.results[0].recordings[0]
     assert recording.title == "Bingo Bango (radio mix)"
     assert recording.length == 225493
     assert recording.video is False
     assert recording.disambiguation == ""
     assert recording.first_release_date == "2000-04-03"
-    minimal_recording = media_file.acoustid_data.results[0].recordings[1]
+    minimal_recording = mediafile.acoustid_data.results[0].recordings[1]
     assert minimal_recording.id == "30cd7bd2-ac63-4dd7-a745-864d298f34cf"
     assert minimal_recording.title is None
     assert minimal_recording.length is None
@@ -92,7 +92,7 @@ def test_load_track_yaml_file(tmp_path: Path) -> None:
     assert minimal_recording.disambiguation is None
     assert minimal_recording.first_release_date is None
     assert minimal_recording.isrcs is None
-    assert media_file.acoustid_data.results[0].score == 0.98905593
+    assert mediafile.acoustid_data.results[0].score == 0.98905593
     serialized = yaml.safe_load(loaded.to_yaml())
     assert isinstance(serialized["trackIdData"], dict)
     serialized_recording = serialized["mediaFileData"][0]["acoustidData"]["results"][0]["recordings"][0]
