@@ -60,6 +60,19 @@ python -m pip install -e ".[dev]"
 
 - `[dev]` - development dependencies (includes `pytest` and `ruff`)
 
+### Load a mediascan configuration
+
+The shared mediascan configuration loader reads `mediaDirs` and `mediaExts`
+from a collection's `mediascan-config.yml`:
+
+```python
+from mediascan.types.config.mediascan_config_loader import load_mediascan_config_file
+
+config = load_mediascan_config_file("/path/to/collection/mediascan-config.yml")
+print(config.media_dirs)
+print(config.media_exts)
+```
+
 ### Track streaming data
 
 `StreamingService` in `mediascan.types.track.streaming.streaming_service` is a

@@ -1,0 +1,12 @@
+from dataclasses import dataclass
+
+from dataclass_wizard.v0 import YAMLWizard
+from dataclass_wizard.v0.enums import LetterCase
+
+
+@dataclass
+class MediascanConfig(YAMLWizard, key_transform=LetterCase.CAMEL):
+    """Configuration fields shared with the Moongas mediascan CLI."""
+
+    media_dirs: list[str]
+    media_exts: list[str]
