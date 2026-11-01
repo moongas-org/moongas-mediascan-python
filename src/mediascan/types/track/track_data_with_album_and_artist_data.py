@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any
 
+from mediascan.utils.db._dataframe_row import optional_integer, optional_text
+
 
 @dataclass
 class TrackDataWithAlbumAndArtistData:
@@ -8,42 +10,49 @@ class TrackDataWithAlbumAndArtistData:
 
     id: int
     path: str
-    album_path: str
-    artist_path: str
+    album_path: str | None
+    artist_path: str | None
     size: int
     format: str
-    title: str
-    artist: str
-    albumartist: str
-    album: str
-    genre: str
-    year: int
+    title: str | None
+    artist: str | None
+    albumartist: str | None
+    album: str | None
+    genre: str | None
+    year: int | None
     duration: int
-    countryCode: str = ""
-    regionCode: str = ""
-    city: str = ""
-    languageCode: str = ""
+    countryCode: str | None = None
+    regionCode: str | None = None
+    city: str | None = None
+    languageCode: str | None = None
 
 
 def row_to_track_data_with_album_and_artist_data(
     row: Any,
 ) -> TrackDataWithAlbumAndArtistData:
+    """Convert a row from get_df_track_album_artist_joined using its column aliases."""
+    track_id = optional_integer(row.track_id)
+    if track_id is None:
+        raise ValueError("track_id must not be missing")
+    path = optional_text(row.track_path)
+    if path is None:
+        raise ValueError("track_path must not be missing")
     return TrackDataWithAlbumAndArtistData(
-        id=int(str(row.id)),
-        path=str(row.path),
-        album_path=str(row.album_path),
-        artist_path=str(row.artist_path),
+        id=track_id,
+        path=path,
+        album_path=optional_text(row.album_path),
+        artist_path=optional_text(row.artist_path),
         size=0,
         format="mp3",
-        title=str(row.title),
-        artist=str(row.artist),
-        albumartist=str(row.albumartist),
-        album=str(row.album),
-        genre=str(row.genre),
-        year=int(str(row.year)),
+        title=optional_text(row.title),
+        artist=optional_text(row.artist),
+        albumartist=optional_text(row.albumartist),
+        album=optional_text(row.album),
+        genre=optional_text(row.track_genre if hasattr(row, "track_genre") else row.genre),
+        year=optional_integer(row.track_year),
         duration=0,
-        countryCode=str(row.countrycode),
-        regionCode=str(row.regioncode),
-        city=str(row.city),
-        languageCode=str(row.languagecode),
+        countryCode=optional_text(row.countrycode),
+        regionCode=optional_text(row.regioncode),
+        city=optional_text(row.city),
+        languageCode=optional_text(row.languagecode),
     )

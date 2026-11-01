@@ -179,16 +179,26 @@ The Python models mirror the current `moongas-mediascan-go` working-tree types:
 - The aggregate `types.artists` and `types.media_files` YAML formats and their
   loaders were removed along with Go's corresponding output commands.
 - `MediaFileWithArtistData` was removed; joined database results remain available
-  as DataFrames via `get_df_track_artist_joined` and `get_df_mediafile_track_joined`.
+  as DataFrames via `get_df_track_album_artist_joined` and
+  `get_df_mediafile_track_album_artist_joined`.
 
-Database helpers in `mediascan.utils.db.mediascan_db_loader` now include
-`get_df_albums`, `get_df_tracks`, and `get_df_trackstreaming` for Go's `album`,
-`track`, and `trackstreaming` tables. `get_df_track_artist_joined` left-joins
+### Database DataFrames and converters
+
+Database helpers in `mediascan.utils.db.mediascan_db_loader` include
+`get_df_artist`, `get_df_album`, `get_df_track`, `get_df_mediafile`, and
+`get_df_trackstreaming` for Go's corresponding tables.
+`get_df_track_album_artist_joined` left-joins
 tracks to artists via `track.artistid` and albums via `track.albumid`, retaining
 tracks even when related rows are missing. It returns all columns in track,
-artist, album order; shared column names such as `id`, `path`, and `name` are
-duplicated. `get_df_mediafile` and `get_df_mediafile_track_joined` provide
-media-file data and its track join.
+artist, album order. Shared column names receive table prefixes, such as
+`track_id`, `track_path`, `artist_name`, and `album_name`, rather than being
+duplicated; unique names remain unchanged.
+`get_df_mediafile_track_album_artist_joined` returns columns in mediafile,
+track, album, artist order, left-joining mediafiles to tracks via
+`mediafile.trackid`, then to albums and artists via the track's foreign keys.
+`get_df_trackstreaming_track_album_artist_joined` follows the same pattern
+starting from `trackstreaming.trackid`. Both retain rows without related data
+and apply the same alias rules.
 
 `get_df_album_artist_joined(engine)` returns all album and artist columns in
 album, artist order, left-joining `album.artistid` to `artist.id`. Albums with
@@ -196,6 +206,18 @@ missing or unmatched artists remain in the result. Conflicting column names
 receive table prefixes, for example `album_id`, `artist_id`, `album_name`, and
 `artist_name`; unique names remain unchanged. Numeric suffixes resolve any
 further alias collisions, keeping DataFrame column names unique.
+
+`row_to_track_data_with_album_and_artist_data` in
+`mediascan.types.track.track_data_with_album_and_artist_data` converts rows from
+`get_df_track_album_artist_joined`. It reads `track_id`, `track_path`, and
+`track_year` into the output fields `id`, `path`, and `year`, and reads
+`track_genre` when the album table also has a `genre` column (otherwise `genre`).
+Nullable metadata, including the year and joined album/artist fields, becomes
+`None` instead of strings such as `"None"` or `"nan"`. Empty strings and zero
+years are preserved. Track IDs and paths remain required; missing values raise
+`ValueError`. Non-string text and non-numeric or fractional integer values
+raise errors rather than being silently coerced. Existing placeholder values
+for size (`0`), format (`"mp3"`), and duration (`0`) remain unchanged.
 
 `MediaFileDataWithAlbumAndArtistData` and
 `row_to_media_file_data_with_album_and_artist_data` in
