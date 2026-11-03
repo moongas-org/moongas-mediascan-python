@@ -1,7 +1,11 @@
 from dataclasses import dataclass
 from typing import Any
 
-from mediascan.utils.db._dataframe_row import optional_integer, optional_text
+from mediascan.utils.db._dataframe_row import (
+    optional_boolean,
+    optional_integer,
+    optional_text,
+)
 
 
 @dataclass
@@ -18,6 +22,7 @@ class TrackDataWithAlbumAndArtistData:
     album: str | None
     genre: str | None
     year: int | None
+    hasspotify: bool | None
     artistid: int | None = None
     albumid: int | None = None
     countryCode: str | None = None
@@ -47,6 +52,7 @@ def row_to_track_data_with_album_and_artist_data(
         album=optional_text(row.album),
         genre=optional_text(row.track_genre if hasattr(row, "track_genre") else row.genre),
         year=optional_integer(row.track_year),
+        hasspotify=optional_boolean(row.hasspotify),
         artistid=optional_integer(
             row.track_artistid if hasattr(row, "track_artistid") else row.artistid
         ),

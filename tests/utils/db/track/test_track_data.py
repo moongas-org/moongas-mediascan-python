@@ -17,13 +17,13 @@ def tracks() -> pd.DataFrame:
                 "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, "
                 "albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, "
                 "albumartist TEXT, album TEXT, genre TEXT, year INTEGER, "
-                "artistid INTEGER, albumid INTEGER)"
+                "artistid INTEGER, albumid INTEGER, hasspotify BOOLEAN NOT NULL)"
             )
             conn.exec_driver_sql(
                 "INSERT INTO track VALUES "
                 "(1, '/music/Artist/Album/track.yml', '/music/Artist/Album', "
                 "'/music/Artist', 'Title', 'Artist', 'Album artist', 'Album', "
-                "'Genre', 2002, 10, 20)"
+                "'Genre', 2002, 10, 20, TRUE)"
             )
         return get_df_track(engine)
     finally:
@@ -48,6 +48,7 @@ def test_convert_track_row(tracks: pd.DataFrame) -> None:
         "year": 2002,
         "artistid": 10,
         "albumid": 20,
+        "hasspotify": True,
     }
     assert row_to_track_data(row.to_dict()) == track
 
@@ -57,6 +58,7 @@ def test_convert_track_row(tracks: pd.DataFrame) -> None:
     [
         ("id", None, ValueError),
         ("path", None, ValueError),
+        ("hasspotify", None, ValueError),
         ("year", "bad", TypeError),
         ("year", 2001.5, ValueError),
         ("title", 123, TypeError),

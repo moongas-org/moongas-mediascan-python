@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from mediascan.utils.db._dataframe_row import (
+    optional_boolean as _optional_boolean,
     optional_integer as _optional_integer,
     optional_text as _optional_text,
 )
@@ -27,6 +28,7 @@ class TrackData:
     year: int | None
     artistid: int | None
     albumid: int | None
+    hasspotify: bool
 
 
 def row_to_track_data(row: _TrackRow) -> TrackData:
@@ -37,6 +39,9 @@ def row_to_track_data(row: _TrackRow) -> TrackData:
     track_id = _optional_integer(row["id"])
     if track_id is None:
         raise ValueError("id must not be missing")
+    has_spotify = _optional_boolean(row["hasspotify"])
+    if has_spotify is None:
+        raise ValueError("hasspotify must not be missing")
     return TrackData(
         id=track_id,
         path=path,
@@ -50,4 +55,5 @@ def row_to_track_data(row: _TrackRow) -> TrackData:
         year=_optional_integer(row["year"]),
         artistid=_optional_integer(row["artistid"]),
         albumid=_optional_integer(row["albumid"]),
+        hasspotify=has_spotify,
     )

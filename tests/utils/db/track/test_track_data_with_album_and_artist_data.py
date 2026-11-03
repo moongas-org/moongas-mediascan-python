@@ -26,6 +26,7 @@ def test_row_to_track_data_with_album_and_artist_data():
             track_year=2001,
             track_artistid=10,
             albumid=20,
+            hasspotify=True,
             countrycode="US",
             regioncode="CA",
             city="Los Angeles",
@@ -53,10 +54,10 @@ def test_convert_actual_joined_track_dataframe(album_has_genre: bool) -> None:
             for statement in (
                 "CREATE TABLE artist (id INTEGER PRIMARY KEY, path TEXT, name TEXT, city TEXT, countrycode TEXT, regioncode TEXT, languagecode TEXT)",
                 "CREATE TABLE album (id INTEGER PRIMARY KEY, path TEXT, name TEXT, year INTEGER)",
-                "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, albumartist TEXT, album TEXT, genre TEXT, year INTEGER, artistid INTEGER, albumid INTEGER)",
+                "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, albumartist TEXT, album TEXT, genre TEXT, year INTEGER, artistid INTEGER, albumid INTEGER, hasspotify BOOLEAN NOT NULL DEFAULT FALSE)",
                 "INSERT INTO artist VALUES (10, '/music/Artist', 'Artist', 'Los Angeles', 'US', 'CA', 'en')",
                 "INSERT INTO album VALUES (20, '/music/Artist/Album', 'Album', 1999)",
-                "INSERT INTO track VALUES (1, '/music/Artist/Album/track.yml', '/music/Artist/Album', '/music/Artist', 'Track', 'Artist', 'Artist', 'Album', 'Rock', 2001, 10, 20)",
+                "INSERT INTO track VALUES (1, '/music/Artist/Album/track.yml', '/music/Artist/Album', '/music/Artist', 'Track', 'Artist', 'Artist', 'Album', 'Rock', 2001, 10, 20, TRUE)",
             ):
                 conn.exec_driver_sql(statement)
             if album_has_genre:
@@ -76,6 +77,7 @@ def test_convert_actual_joined_track_dataframe(album_has_genre: bool) -> None:
             album="Album",
             genre="Rock",
             year=2001,
+            hasspotify=True,
             artistid=10,
             albumid=20,
             countryCode="US",
@@ -103,13 +105,13 @@ def test_convert_nullable_track_from_loader(
             for statement in (
                 "CREATE TABLE artist (id INTEGER PRIMARY KEY, path TEXT, name TEXT, city TEXT, countrycode TEXT, regioncode TEXT, languagecode TEXT)",
                 "CREATE TABLE album (id INTEGER PRIMARY KEY, path TEXT, name TEXT, year INTEGER, genre TEXT)",
-                "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, title TEXT, artist TEXT, albumartist TEXT, album TEXT, genre TEXT, year INTEGER, artistid INTEGER, albumid INTEGER)",
+                "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, title TEXT, artist TEXT, albumartist TEXT, album TEXT, genre TEXT, year INTEGER, artistid INTEGER, albumid INTEGER, hasspotify BOOLEAN NOT NULL DEFAULT FALSE)",
                 "INSERT INTO artist VALUES (10, '/music/Artist', 'Artist', 'City', 'US', 'CA', 'en')",
                 "INSERT INTO album VALUES (20, '/music/Artist/Album', 'Album', 1999, 'Rock')",
             ):
                 conn.exec_driver_sql(statement)
             conn.exec_driver_sql(
-                "INSERT INTO track VALUES (1, '/music/track.yml', NULL, NULL, NULL, NULL, NULL, ?, ?, ?)",
+                "INSERT INTO track VALUES (1, '/music/track.yml', NULL, NULL, NULL, NULL, NULL, ?, ?, ?, FALSE)",
                 (year, artist_id, album_id),
             )
         row = get_df_track_album_artist_joined(engine).iloc[0]
@@ -117,6 +119,7 @@ def test_convert_nullable_track_from_loader(
         assert track.id == 1
         assert track.path == "/music/track.yml"
         assert track.year == year
+        assert track.hasspotify is False
         assert track.artistid == artist_id
         assert track.albumid == album_id
         assert track.title is None
@@ -147,6 +150,7 @@ def nullable_track_row() -> SimpleNamespace:
         album=None,
         track_genre=None,
         track_year=None,
+        hasspotify=None,
         track_artistid=None,
         albumid=None,
         countrycode=None,
@@ -177,6 +181,7 @@ def test_convert_track_missing_values(
         "album",
         "genre",
         "year",
+        "hasspotify",
         "artistid",
         "albumid",
         "countryCode",

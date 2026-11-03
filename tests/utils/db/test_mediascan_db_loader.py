@@ -23,7 +23,7 @@ def test_go_database_tables_and_existing_join() -> None:
                 "CREATE TABLE artist (id INTEGER PRIMARY KEY, path TEXT, name TEXT, city TEXT, countrycode TEXT, regioncode TEXT, languagecode TEXT)",
                 "CREATE TABLE album (id INTEGER PRIMARY KEY, path TEXT, name TEXT, year INTEGER, explicitcover BOOLEAN)",
                 "CREATE TABLE mediafile (id INTEGER PRIMARY KEY, path TEXT, trackid INTEGER REFERENCES track(id))",
-                "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, albumartist TEXT, album TEXT, genre TEXT, year INTEGER, artistid INTEGER REFERENCES artist(id), albumid INTEGER REFERENCES album(id))",
+                "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, albumartist TEXT, album TEXT, genre TEXT, year INTEGER, artistid INTEGER REFERENCES artist(id), albumid INTEGER REFERENCES album(id), hasspotify BOOLEAN NOT NULL DEFAULT FALSE)",
                 "CREATE TABLE trackstreaming (trackid INTEGER NOT NULL REFERENCES track(id), streamingservice TEXT NOT NULL, streamingtrackid TEXT NOT NULL)",
                 "INSERT INTO artist (id, path, name) VALUES (1, '/music/Artist', 'Artist')",
                 "INSERT INTO album (id, path, name) VALUES (2, '/music/Artist/Album', 'Album')",
@@ -35,6 +35,7 @@ def test_go_database_tables_and_existing_join() -> None:
         assert get_df_artist(engine)["name"].tolist() == ["Artist"]
         assert get_df_album(engine)["name"].tolist() == ["Album"]
         assert get_df_track(engine)["id"].tolist() == [4]
+        assert get_df_track(engine)["hasspotify"].tolist() == [0]
         streaming = get_df_trackstreaming(engine)
         assert streaming.to_dict("records") == [
             {"trackid": 4, "streamingservice": "spotify", "streamingtrackid": "spotify-id"}
@@ -42,6 +43,7 @@ def test_go_database_tables_and_existing_join() -> None:
         joined = get_df_track_album_artist_joined(engine)
         assert joined.loc[0, "artist_name"] == "Artist"
         assert joined.loc[0, "album_name"] == "Album"
+        assert joined.loc[0, "hasspotify"] == 0
         assert joined.columns.is_unique
         assert get_df_mediafile(engine)["id"].tolist() == [3]
         mediafile_joined = get_df_mediafile_track_album_artist_joined(engine)
