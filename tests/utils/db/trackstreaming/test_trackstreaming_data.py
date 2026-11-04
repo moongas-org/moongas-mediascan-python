@@ -18,10 +18,12 @@ def trackstreaming() -> pd.DataFrame:
         with engine.begin() as conn:
             conn.exec_driver_sql(
                 "CREATE TABLE trackstreaming (trackid INTEGER NOT NULL, "
-                "streamingservice TEXT NOT NULL, streamingtrackid TEXT NOT NULL)"
+                "streamingservice TEXT NOT NULL, streamingtrackid TEXT NOT NULL, "
+                "streamingtrackurl TEXT)"
             )
             conn.exec_driver_sql(
-                "INSERT INTO trackstreaming VALUES (4, 'spotify', 'spotify-id')"
+                "INSERT INTO trackstreaming VALUES "
+                "(4, 'spotify', 'spotify-id', 'https://open.spotify.com/track/spotify-id')"
             )
         return get_df_trackstreaming(engine)
     finally:
@@ -37,8 +39,17 @@ def test_convert_trackstreaming_row(trackstreaming: pd.DataFrame) -> None:
         "track_id": 4,
         "streaming_service": "spotify",
         "streaming_track_id": "spotify-id",
+        "streaming_track_url": "https://open.spotify.com/track/spotify-id",
     }
     assert row_to_trackstreaming_data(row.to_dict()) == streaming
+
+
+def test_convert_trackstreaming_row_without_url_column() -> None:
+    streaming = row_to_trackstreaming_data(
+        {"trackid": 4, "streamingservice": "spotify", "streamingtrackid": "spotify-id"}
+    )
+
+    assert streaming.streaming_track_url is None
 
 
 @pytest.mark.parametrize(

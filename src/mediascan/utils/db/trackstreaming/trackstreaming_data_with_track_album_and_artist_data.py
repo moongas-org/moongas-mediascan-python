@@ -20,6 +20,7 @@ class TrackStreamingDataWithTrackAlbumAndArtistData:
     track_id: int
     streaming_service: str
     streaming_track_id: str
+    streaming_track_url: str | None
     path: str | None
     album_path: str | None
     artist_path: str | None
@@ -51,10 +52,14 @@ def row_to_trackstreaming_data_with_track_album_and_artist_data(
     streaming_track_id = _optional_text(row["streamingtrackid"])
     if streaming_track_id is None:
         raise ValueError("streamingtrackid must not be missing")
+    streaming_track_url = _optional_text(
+        row["streamingtrackurl"] if "streamingtrackurl" in row else None
+    )
     return TrackStreamingDataWithTrackAlbumAndArtistData(
         track_id=track_id,
         streaming_service=streaming_service,
         streaming_track_id=streaming_track_id,
+        streaming_track_url=streaming_track_url,
         path=_optional_text(row["track_path"]),
         album_path=_optional_text(row["album_path"]),
         artist_path=_optional_text(row["artist_path"]),

@@ -9,6 +9,7 @@ from mediascan.utils.db._dataframe_row import (
 
 class _TrackStreamingRow(Protocol):
     def __getitem__(self, key: str, /) -> object: ...
+    def __contains__(self, key: object, /) -> bool: ...
 
 
 @dataclass
@@ -18,6 +19,7 @@ class TrackStreamingData:
     track_id: int
     streaming_service: str
     streaming_track_id: str
+    streaming_track_url: str | None
 
 
 def row_to_trackstreaming_data(row: _TrackStreamingRow) -> TrackStreamingData:
@@ -31,8 +33,12 @@ def row_to_trackstreaming_data(row: _TrackStreamingRow) -> TrackStreamingData:
     streaming_track_id = _optional_text(row["streamingtrackid"])
     if streaming_track_id is None:
         raise ValueError("streamingtrackid must not be missing")
+    streaming_track_url = _optional_text(
+        row["streamingtrackurl"] if "streamingtrackurl" in row else None
+    )
     return TrackStreamingData(
         track_id=track_id,
         streaming_service=streaming_service,
         streaming_track_id=streaming_track_id,
+        streaming_track_url=streaming_track_url,
     )
