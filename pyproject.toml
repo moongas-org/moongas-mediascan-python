@@ -10,7 +10,7 @@ authors = [{ name = "moongas.org", email = "moongas.org@gmail.com" }]
 maintainers = [{ name = "moongas.org", email = "moongas.org@gmail.com" }]
 description = "A Python project for working with moongas mediascan database and metadata files."
 readme = "README.md"
-license = { file = "LICENSE.txt" }
+license = { file = "LICENSE" }
 keywords = [
   "moongas", 
   "mediascan", 

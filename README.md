@@ -45,7 +45,7 @@ graph TD;
 # Quick Start
 
 ```bash
-pip install "git+https://github.com/moongas-org/moongas-mediascan-python.git"
+uv add git+https://github.com/moongas-org/moongas-mediascan-python.git
 ```
 
 ### (Developer) Clone GitHub repo and install (editable)
@@ -53,12 +53,34 @@ pip install "git+https://github.com/moongas-org/moongas-mediascan-python.git"
 ```bash
 git clone git@github.com:moongas-org/moongas-mediascan-python.git
 cd moongas-mediascan-python
-python -m pip install -e ".[dev]"
+uv sync --extra dev
 ```
 
-### Optional dependency groups
+uv uses `.venv` as the project environment. If your terminal still has a
+different environment activated (for example, `.venv.314`), run `deactivate`
+before syncing or running commands. To activate the project environment on
+Linux or macOS:
 
-- `[dev]` - development dependencies (includes `pytest` and `ruff`)
+```bash
+deactivate
+source .venv/bin/activate
+```
+
+Only run `deactivate` when an environment is already activated. In VS Code,
+select `.venv/bin/python` with **Python: Select Interpreter**, then open a new
+terminal. uv commands do not require manual activation.
+
+Run the test suite and linter in the project environment with:
+
+```bash
+uv run pytest
+uv run ruff check .
+```
+
+The committed `uv.lock` pins the resolved development environment. When project
+dependencies change, update it with `uv lock` and commit the resulting lockfile.
+The `dev` extra installs the development dependencies, including `pytest` and
+`ruff`.
 
 ### Load a mediascan configuration
 
