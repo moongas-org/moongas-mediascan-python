@@ -78,7 +78,9 @@ uv run ruff check .
 ```
 
 The committed `uv.lock` pins the resolved development environment. When project
-dependencies change, update it with `uv lock` and commit the resulting lockfile.
+dependencies or the version in `pyproject.toml` change, update it with `uv lock`
+and commit the resulting lockfile. Verify it with `uv sync --locked --extra dev`,
+the same command used by CI.
 The `dev` extra installs the development dependencies, including `pytest` and
 `ruff`.
 
