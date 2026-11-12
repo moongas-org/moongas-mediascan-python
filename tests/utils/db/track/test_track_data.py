@@ -17,13 +17,15 @@ def tracks() -> pd.DataFrame:
                 "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, "
                 "albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, "
                 "albumartist TEXT, album TEXT, genre TEXT, year INTEGER, "
-                "artistid INTEGER, albumid INTEGER, hasspotify BOOLEAN NOT NULL)"
+                "artistid INTEGER, albumid INTEGER, hasspotify BOOLEAN NOT NULL, "
+                "hasmedia BOOLEAN NOT NULL, haslyricstxt BOOLEAN NOT NULL, "
+                "haslyricslrc BOOLEAN NOT NULL)"
             )
             conn.exec_driver_sql(
                 "INSERT INTO track VALUES "
                 "(1, '/music/Artist/Album/track.yml', '/music/Artist/Album', "
                 "'/music/Artist', 'Title', 'Artist', 'Album artist', 'Album', "
-                "'Genre', 2002, 10, 20, TRUE)"
+                "'Genre', 2002, 10, 20, TRUE, TRUE, FALSE, TRUE)"
             )
         return get_df_track(engine)
     finally:
@@ -49,6 +51,9 @@ def test_convert_track_row(tracks: pd.DataFrame) -> None:
         "artistid": 10,
         "albumid": 20,
         "hasspotify": True,
+        "hasmedia": True,
+        "haslyricstxt": False,
+        "haslyricslrc": True,
     }
     assert row_to_track_data(row.to_dict()) == track
 
@@ -59,6 +64,9 @@ def test_convert_track_row(tracks: pd.DataFrame) -> None:
         ("id", None, ValueError),
         ("path", None, ValueError),
         ("hasspotify", None, ValueError),
+        ("hasmedia", None, ValueError),
+        ("haslyricstxt", None, ValueError),
+        ("haslyricslrc", None, ValueError),
         ("year", "bad", TypeError),
         ("year", 2001.5, ValueError),
         ("title", 123, TypeError),

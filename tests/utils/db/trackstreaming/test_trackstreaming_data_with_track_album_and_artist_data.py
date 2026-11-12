@@ -21,11 +21,11 @@ def joined_trackstreaming() -> pd.DataFrame:
             for statement in (
                 "CREATE TABLE artist (id INTEGER PRIMARY KEY, path TEXT, name TEXT, city TEXT, countrycode TEXT, regioncode TEXT, languagecode TEXT)",
                 "CREATE TABLE album (id INTEGER PRIMARY KEY, path TEXT, name TEXT, year INTEGER, genre TEXT)",
-                "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, albumartist TEXT, album TEXT, genre TEXT, year INTEGER, artistid INTEGER, albumid INTEGER, hasspotify BOOLEAN NOT NULL DEFAULT FALSE)",
+                "CREATE TABLE track (id INTEGER PRIMARY KEY, path TEXT, albumpath TEXT, artistpath TEXT, title TEXT, artist TEXT, albumartist TEXT, album TEXT, genre TEXT, year INTEGER, artistid INTEGER, albumid INTEGER, hasspotify BOOLEAN NOT NULL DEFAULT FALSE, hasmedia BOOLEAN NOT NULL DEFAULT FALSE, haslyricstxt BOOLEAN NOT NULL DEFAULT FALSE, haslyricslrc BOOLEAN NOT NULL DEFAULT FALSE)",
                 "CREATE TABLE trackstreaming (trackid INTEGER NOT NULL, streamingservice TEXT NOT NULL, streamingtrackid TEXT NOT NULL, streamingtrackurl TEXT)",
                 "INSERT INTO artist VALUES (10, '/music/Artist', 'Artist', 'City', 'US', 'CA', 'en')",
                 "INSERT INTO album VALUES (20, '/music/Artist/Album', 'Album', 2000, 'Album genre')",
-                "INSERT INTO track VALUES (4, '/music/Artist/Album/track.yml', '/music/Artist/Album', '/music/Artist', 'Title', 'Artist', 'Album artist', 'Album', 'Track genre', 2001, 10, 20, TRUE)",
+                "INSERT INTO track VALUES (4, '/music/Artist/Album/track.yml', '/music/Artist/Album', '/music/Artist', 'Title', 'Artist', 'Album artist', 'Album', 'Track genre', 2001, 10, 20, TRUE, TRUE, FALSE, TRUE)",
                 "INSERT INTO trackstreaming VALUES (4, 'spotify', 'spotify-id', 'https://open.spotify.com/track/spotify-id')",
                 "INSERT INTO trackstreaming VALUES (99, 'apple-music', 'apple-id', NULL)",
             ):
@@ -57,6 +57,9 @@ def test_convert_joined_trackstreaming_row(
         "genre": "Track genre",
         "year": 2001,
         "hasspotify": True,
+        "hasmedia": True,
+        "haslyricstxt": False,
+        "haslyricslrc": True,
         "artistid": 10,
         "albumid": 20,
         "countryCode": "US",

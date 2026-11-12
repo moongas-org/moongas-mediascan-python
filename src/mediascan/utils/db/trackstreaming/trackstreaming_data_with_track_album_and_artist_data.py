@@ -31,6 +31,9 @@ class TrackStreamingDataWithTrackAlbumAndArtistData:
     genre: str | None
     year: int | None
     hasspotify: bool | None
+    hasmedia: bool | None
+    haslyricstxt: bool | None
+    haslyricslrc: bool | None
     artistid: int | None
     albumid: int | None
     countryCode: str | None
@@ -74,6 +77,9 @@ def row_to_trackstreaming_data_with_track_album_and_artist_data(
             row["track_year"] if "track_year" in row else row["year"]
         ),
         hasspotify=_optional_boolean(row["hasspotify"]),
+        hasmedia=_optional_boolean(row["hasmedia"]),
+        haslyricstxt=_optional_boolean(row["haslyricstxt"]),
+        haslyricslrc=_optional_boolean(row["haslyricslrc"]),
         artistid=_optional_integer(
             row["track_artistid"] if "track_artistid" in row else row["artistid"]
         ),

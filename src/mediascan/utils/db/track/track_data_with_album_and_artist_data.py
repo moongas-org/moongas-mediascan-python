@@ -23,6 +23,9 @@ class TrackDataWithAlbumAndArtistData:
     genre: str | None
     year: int | None
     hasspotify: bool | None
+    hasmedia: bool | None
+    haslyricstxt: bool | None
+    haslyricslrc: bool | None
     artistid: int | None = None
     albumid: int | None = None
     countryCode: str | None = None
@@ -53,6 +56,9 @@ def row_to_track_data_with_album_and_artist_data(
         genre=optional_text(row.track_genre if hasattr(row, "track_genre") else row.genre),
         year=optional_integer(row.track_year),
         hasspotify=optional_boolean(row.hasspotify),
+        hasmedia=optional_boolean(row.hasmedia),
+        haslyricstxt=optional_boolean(row.haslyricstxt),
+        haslyricslrc=optional_boolean(row.haslyricslrc),
         artistid=optional_integer(
             row.track_artistid if hasattr(row, "track_artistid") else row.artistid
         ),

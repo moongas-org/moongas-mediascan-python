@@ -29,6 +29,9 @@ class TrackData:
     artistid: int | None
     albumid: int | None
     hasspotify: bool
+    hasmedia: bool
+    haslyricstxt: bool
+    haslyricslrc: bool
 
 
 def row_to_track_data(row: _TrackRow) -> TrackData:
@@ -42,6 +45,15 @@ def row_to_track_data(row: _TrackRow) -> TrackData:
     has_spotify = _optional_boolean(row["hasspotify"])
     if has_spotify is None:
         raise ValueError("hasspotify must not be missing")
+    has_media = _optional_boolean(row["hasmedia"])
+    if has_media is None:
+        raise ValueError("hasmedia must not be missing")
+    has_lyrics_txt = _optional_boolean(row["haslyricstxt"])
+    if has_lyrics_txt is None:
+        raise ValueError("haslyricstxt must not be missing")
+    has_lyrics_lrc = _optional_boolean(row["haslyricslrc"])
+    if has_lyrics_lrc is None:
+        raise ValueError("haslyricslrc must not be missing")
     return TrackData(
         id=track_id,
         path=path,
@@ -56,4 +68,7 @@ def row_to_track_data(row: _TrackRow) -> TrackData:
         artistid=_optional_integer(row["artistid"]),
         albumid=_optional_integer(row["albumid"]),
         hasspotify=has_spotify,
+        hasmedia=has_media,
+        haslyricstxt=has_lyrics_txt,
+        haslyricslrc=has_lyrics_lrc,
     )
