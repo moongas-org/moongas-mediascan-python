@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from mediascan.utils.db._dataframe_row import (
+    optional_boolean as _optional_boolean,
     optional_integer as _optional_integer,
     optional_text as _optional_text,
 )
@@ -22,6 +23,7 @@ class ArtistData:
     countryCode: str | None
     regionCode: str | None
     languageCode: str | None
+    hasartistyaml: bool
 
 
 def row_to_artist_data(row: _ArtistRow) -> ArtistData:
@@ -32,6 +34,9 @@ def row_to_artist_data(row: _ArtistRow) -> ArtistData:
     artist_id = _optional_integer(row["id"])
     if artist_id is None:
         raise ValueError("id must not be missing")
+    has_artist_yaml = _optional_boolean(row["hasartistyaml"])
+    if has_artist_yaml is None:
+        raise ValueError("hasartistyaml must not be missing")
     return ArtistData(
         id=artist_id,
         path=path,
@@ -40,4 +45,5 @@ def row_to_artist_data(row: _ArtistRow) -> ArtistData:
         countryCode=_optional_text(row["countrycode"]),
         regionCode=_optional_text(row["regioncode"]),
         languageCode=_optional_text(row["languagecode"]),
+        hasartistyaml=has_artist_yaml,
     )

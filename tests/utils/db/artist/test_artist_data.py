@@ -16,15 +16,15 @@ def artists() -> pd.DataFrame:
             conn.exec_driver_sql(
                 "CREATE TABLE artist (id INTEGER PRIMARY KEY, path TEXT UNIQUE, "
                 "name TEXT, city TEXT, countrycode TEXT, regioncode TEXT, "
-                "languagecode TEXT)"
+                "languagecode TEXT, hasartistyaml BOOLEAN NOT NULL DEFAULT FALSE)"
             )
             conn.exec_driver_sql(
                 "INSERT INTO artist VALUES "
-                "(10, '/music/Artist', 'Artist', 'Los Angeles', 'US', 'CA', 'en')"
+                "(10, '/music/Artist', 'Artist', 'Los Angeles', 'US', 'CA', 'en', 1)"
             )
             conn.exec_driver_sql(
                 "INSERT INTO artist VALUES "
-                "(11, '/music/Other', NULL, NULL, NULL, NULL, NULL)"
+                "(11, '/music/Other', NULL, NULL, NULL, NULL, NULL, 0)"
             )
         return get_df_artist(engine)
     finally:
@@ -44,6 +44,7 @@ def test_convert_artist_row(artists: pd.DataFrame) -> None:
         "countryCode": "US",
         "regionCode": "CA",
         "languageCode": "en",
+        "hasartistyaml": True,
     }
     assert row_to_artist_data(row.to_dict()) == artist
 
@@ -54,6 +55,7 @@ def test_convert_artist_with_missing_metadata(artists: pd.DataFrame) -> None:
     assert artist.name is None
     assert artist.city is None
     assert artist.countryCode is None
+    assert artist.hasartistyaml is False
 
 
 @pytest.mark.parametrize(
@@ -62,6 +64,9 @@ def test_convert_artist_with_missing_metadata(artists: pd.DataFrame) -> None:
         ("id", None, ValueError),
         ("path", None, ValueError),
         ("name", 123, TypeError),
+        ("hasartistyaml", None, ValueError),
+        ("hasartistyaml", 2, ValueError),
+        ("hasartistyaml", "yes", TypeError),
     ],
 )
 def test_convert_invalid_values_raises(

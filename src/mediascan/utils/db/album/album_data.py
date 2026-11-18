@@ -23,6 +23,7 @@ class AlbumData:
     explicitcover: bool | None
     artistid: int | None
     genre: str | None
+    hasalbumyaml: bool
 
 
 def row_to_album_data(row: _AlbumRow) -> AlbumData:
@@ -33,6 +34,9 @@ def row_to_album_data(row: _AlbumRow) -> AlbumData:
     album_id = _optional_integer(row["id"])
     if album_id is None:
         raise ValueError("id must not be missing")
+    has_album_yaml = _optional_boolean(row["hasalbumyaml"])
+    if has_album_yaml is None:
+        raise ValueError("hasalbumyaml must not be missing")
     return AlbumData(
         id=album_id,
         path=path,
@@ -41,4 +45,5 @@ def row_to_album_data(row: _AlbumRow) -> AlbumData:
         explicitcover=_optional_boolean(row["explicitcover"]),
         artistid=_optional_integer(row["artistid"]),
         genre=_optional_text(row["genre"]),
+        hasalbumyaml=has_album_yaml,
     )
