@@ -16,14 +16,15 @@ def albums() -> pd.DataFrame:
             conn.exec_driver_sql(
                 "CREATE TABLE album (id INTEGER PRIMARY KEY, path TEXT UNIQUE, "
                 "name TEXT, year INTEGER, explicitcover BOOLEAN, "
-                "artistid INTEGER, genre TEXT, hasalbumyaml BOOLEAN NOT NULL DEFAULT FALSE)"
+                "artistid INTEGER, genre TEXT, hasalbumyaml BOOLEAN NOT NULL DEFAULT FALSE, "
+                "hascover BOOLEAN NOT NULL DEFAULT FALSE)"
             )
             conn.exec_driver_sql(
                 "INSERT INTO album VALUES "
-                "(20, '/music/Artist/Album', 'Album', 2001, 1, 10, 'Rock', 1)"
+                "(20, '/music/Artist/Album', 'Album', 2001, 1, 10, 'Rock', 1, 1)"
             )
             conn.exec_driver_sql(
-                "INSERT INTO album VALUES "
+                "INSERT INTO album (id, path, name, year, explicitcover, artistid, genre, hasalbumyaml) VALUES "
                 "(21, '/music/Artist/Other', NULL, NULL, NULL, NULL, NULL, 0)"
             )
         return get_df_album(engine)
@@ -45,6 +46,7 @@ def test_convert_album_row(albums: pd.DataFrame) -> None:
         "artistid": 10,
         "genre": "Rock",
         "hasalbumyaml": True,
+        "hascover": True,
     }
     assert row_to_album_data(row.to_dict()) == album
 
@@ -58,6 +60,7 @@ def test_convert_album_with_missing_metadata(albums: pd.DataFrame) -> None:
     assert album.artistid is None
     assert album.genre is None
     assert album.hasalbumyaml is False
+    assert album.hascover is False
 
 
 @pytest.mark.parametrize(
@@ -72,6 +75,9 @@ def test_convert_album_with_missing_metadata(albums: pd.DataFrame) -> None:
         ("hasalbumyaml", None, ValueError),
         ("hasalbumyaml", 2, ValueError),
         ("hasalbumyaml", "yes", TypeError),
+        ("hascover", None, ValueError),
+        ("hascover", 2, ValueError),
+        ("hascover", "yes", TypeError),
     ],
 )
 def test_convert_invalid_values_raises(

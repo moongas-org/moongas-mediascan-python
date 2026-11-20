@@ -23,6 +23,7 @@ class AlbumDataWithArtistData:
     explicitcover: bool | None
     artistid: int | None
     genre: str | None
+    hascover: bool
     artist_path: str | None
     artist_name: str | None
     city: str | None
@@ -41,6 +42,9 @@ def row_to_album_data_with_artist_data(
     album_id = _optional_integer(row["album_id"])
     if album_id is None:
         raise ValueError("album_id must not be missing")
+    has_cover = _optional_boolean(row["hascover"])
+    if has_cover is None:
+        raise ValueError("hascover must not be missing")
     return AlbumDataWithArtistData(
         id=album_id,
         path=path,
@@ -49,6 +53,7 @@ def row_to_album_data_with_artist_data(
         explicitcover=_optional_boolean(row["explicitcover"]),
         artistid=_optional_integer(row["artistid"]),
         genre=_optional_text(row["genre"]),
+        hascover=has_cover,
         artist_path=_optional_text(row["artist_path"]),
         artist_name=_optional_text(row["artist_name"]),
         city=_optional_text(row["city"]),

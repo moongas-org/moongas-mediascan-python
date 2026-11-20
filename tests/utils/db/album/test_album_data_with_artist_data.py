@@ -18,10 +18,10 @@ def joined_albums() -> pd.DataFrame:
         with engine.begin() as conn:
             for statement in (
                 "CREATE TABLE artist (id INTEGER PRIMARY KEY, path TEXT UNIQUE, name TEXT, city TEXT, countrycode TEXT, regioncode TEXT, languagecode TEXT)",
-                "CREATE TABLE album (id INTEGER PRIMARY KEY, path TEXT UNIQUE, name TEXT, year INTEGER, explicitcover BOOLEAN, artistid INTEGER, genre TEXT)",
+                "CREATE TABLE album (id INTEGER PRIMARY KEY, path TEXT UNIQUE, name TEXT, year INTEGER, explicitcover BOOLEAN, artistid INTEGER, genre TEXT, hascover BOOLEAN NOT NULL DEFAULT FALSE)",
                 "INSERT INTO artist VALUES (10, '/music/Artist', 'Artist', 'Los Angeles', 'US', 'CA', 'en')",
-                "INSERT INTO album VALUES (20, '/music/Artist/Album', 'Album', 2001, 0, 10, 'Rock')",
-                "INSERT INTO album VALUES (21, '/music/Missing/Album', 'Orphan', NULL, NULL, 99, NULL)",
+                "INSERT INTO album VALUES (20, '/music/Artist/Album', 'Album', 2001, 0, 10, 'Rock', 1)",
+                "INSERT INTO album (id, path, name, year, explicitcover, artistid, genre) VALUES (21, '/music/Missing/Album', 'Orphan', NULL, NULL, 99, NULL)",
             ):
                 conn.exec_driver_sql(statement)
         return get_df_album_artist_joined(engine)
@@ -42,6 +42,7 @@ def test_convert_joined_album_row(joined_albums: pd.DataFrame) -> None:
         "explicitcover": False,
         "artistid": 10,
         "genre": "Rock",
+        "hascover": True,
         "artist_path": "/music/Artist",
         "artist_name": "Artist",
         "city": "Los Angeles",
@@ -60,6 +61,7 @@ def test_convert_album_without_matching_artist(joined_albums: pd.DataFrame) -> N
     assert album.name == "Orphan"
     assert album.artistid == 99
     assert album.explicitcover is None
+    assert album.hascover is False
     assert album.artist_path is None
     assert album.artist_name is None
     assert album.countryCode is None
@@ -71,6 +73,9 @@ def test_convert_album_without_matching_artist(joined_albums: pd.DataFrame) -> N
         ("album_id", None, ValueError),
         ("album_path", None, ValueError),
         ("explicitcover", 2, ValueError),
+        ("hascover", None, ValueError),
+        ("hascover", 2, ValueError),
+        ("hascover", "yes", TypeError),
         ("album_name", 123, TypeError),
     ],
 )

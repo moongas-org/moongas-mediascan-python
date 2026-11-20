@@ -231,6 +231,12 @@ receive table prefixes, for example `album_id`, `artist_id`, `album_name`, and
 `artist_name`; unique names remain unchanged. Numeric suffixes resolve any
 further alias collisions, keeping DataFrame column names unique.
 
+`AlbumData` and `AlbumDataWithArtistData` expose the album table's non-null
+`hascover` boolean. Go's scanner sets it when the album directory contains a
+regular `cover.jpg` or `cover.webp` file. Their row converters require this
+column, so databases produced before its addition must be regenerated or
+migrated before using those converters.
+
 `row_to_track_data_with_album_and_artist_data` in
 `mediascan.utils.db.track.track_data_with_album_and_artist_data` converts rows from
 `get_df_track_album_artist_joined`. It reads `track_id`, `track_path`, and
